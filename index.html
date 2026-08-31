@@ -3,1325 +3,819 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fernando e Kevin Pro -Amigos Atleticanos - Gestão Premium</title>
+    <title>Fernando e Kevin Pro — Gestão Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- 🔥 FIREBASE - Tag Script (funciona no GitHub Pages) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
     <style>
-        /* =============================================
-           VARIÁVEIS CSS - TEMA CLARO
-           ============================================= */
+        /* ========== VARIÁVEIS ========== */
         :root {
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            
-            /* Cores principais */
-            --color-primary: #6C63FF;
-            --color-primary-dark: #5A52D5;
-            --color-primary-light: #8B83FF;
-            --color-secondary: #FF6B6B;
-            --color-accent: #FFD93D;
-            --color-success: #00C9A7;
-            --color-success-bg: rgba(0, 201, 167, 0.12);
-            --color-warning: #FF9F43;
-            --color-warning-bg: rgba(255, 159, 67, 0.12);
-            --color-danger: #FF6B6B;
-            --color-danger-bg: rgba(255, 107, 107, 0.12);
-            --color-info: #4ECDC4;
-            
-            /* Fundos */
-            --bg-primary: #f5f7fe;
-            --bg-secondary: #ffffff;
-            --bg-card: rgba(255, 255, 255, 0.72);
-            --bg-card-hover: rgba(255, 255, 255, 0.92);
-            --bg-header: rgba(255, 255, 255, 0.82);
-            
-            /* Texto */
-            --text-primary: #1A1A2E;
+            --font: 'Inter', system-ui, sans-serif;
+            --primary: #6C63FF;
+            --primary-dark: #5A52D5;
+            --primary-light: #8B83FF;
+            --secondary: #FF6B6B;
+            --accent: #FFD93D;
+            --success: #00C9A7;
+            --warning: #FF9F43;
+            --danger: #FF6B6B;
+            --bg: #f5f7fe;
+            --bg-card: rgba(255,255,255,0.72);
+            --bg-card-hover: rgba(255,255,255,0.92);
+            --text: #1A1A2E;
             --text-secondary: #4A4A6A;
             --text-muted: #8A8AA8;
-            --text-white: #ffffff;
-            
-            /* Bordas e sombras */
-            --border-color: rgba(108, 99, 255, 0.08);
-            --shadow-sm: 0 2px 12px rgba(108, 99, 255, 0.06);
-            --shadow-md: 0 8px 32px rgba(108, 99, 255, 0.08);
-            --shadow-lg: 0 16px 48px rgba(108, 99, 255, 0.12);
-            --shadow-xl: 0 24px 64px rgba(108, 99, 255, 0.16);
-            --shadow-glow: 0 0 40px rgba(108, 99, 255, 0.15);
-            
-            /* Glassmorphism */
-            --glass-bg: rgba(255, 255, 255, 0.35);
-            --glass-border: rgba(255, 255, 255, 0.45);
-            --glass-shadow: 0 8px 32px rgba(108, 99, 255, 0.06);
-            
-            /* Status */
-            --status-pago-bg: rgba(0, 201, 167, 0.15);
-            --status-pago-text: #00C9A7;
-            --status-pendente-bg: rgba(255, 159, 67, 0.15);
-            --status-pendente-text: #FF9F43;
-            
-            /* Botões */
-            --btn-primary-bg: linear-gradient(135deg, #6C63FF, #5A52D5);
-            --btn-primary-hover: linear-gradient(135deg, #7B73FF, #6C63FF);
-            --btn-success-bg: linear-gradient(135deg, #00C9A7, #00B894);
-            --btn-danger-bg: linear-gradient(135deg, #FF6B6B, #E55A5A);
-            --btn-warning-bg: linear-gradient(135deg, #FF9F43, #F1902D);
-            
-            /* Outros */
-            --card-radius: 24px;
-            --blur-amount: 24px;
-            --transition-speed: 0.5s;
-            --glow-opacity: 0.6;
+            --border: rgba(108,99,255,0.08);
+            --shadow: 0 8px 32px rgba(108,99,255,0.08);
+            --shadow-lg: 0 16px 48px rgba(108,99,255,0.12);
+            --radius: 24px;
+            --glass: rgba(255,255,255,0.35);
+            --transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* =============================================
-           TEMA ESCURO
-           ============================================= */
         [data-theme="dark"] {
-            --bg-primary: #0a0a1a;
-            --bg-secondary: #12122a;
-            --bg-card: rgba(18, 18, 42, 0.78);
-            --bg-card-hover: rgba(26, 26, 58, 0.92);
-            --bg-header: rgba(10, 10, 26, 0.88);
-            
-            --text-primary: #e8e8f0;
+            --bg: #0a0a1a;
+            --bg-card: rgba(18,18,42,0.78);
+            --bg-card-hover: rgba(26,26,58,0.92);
+            --text: #e8e8f0;
             --text-secondary: #a0a0c0;
             --text-muted: #6a6a8a;
-            
-            --border-color: rgba(108, 99, 255, 0.12);
-            --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
-            --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.6);
-            --shadow-glow: 0 0 40px rgba(108, 99, 255, 0.08);
-            
-            --glass-bg: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(255, 255, 255, 0.06);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            
-            --status-pago-bg: rgba(0, 201, 167, 0.12);
-            --status-pendente-bg: rgba(255, 159, 67, 0.12);
-            
-            --btn-primary-bg: linear-gradient(135deg, #7B73FF, #6C63FF);
+            --border: rgba(108,99,255,0.12);
+            --shadow: 0 8px 32px rgba(0,0,0,0.4);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.5);
+            --glass: rgba(255,255,255,0.04);
         }
 
-        /* =============================================
-           RESET E BASE
-           ============================================= */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family: var(--font-primary);
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             padding: 2rem;
-            transition: all var(--transition-speed) ease;
+            transition: all var(--transition);
+            -webkit-font-smoothing: antialiased;
             position: relative;
             overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Fundo com gradiente animado e partículas */
-        .bg-particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-
-        .bg-particles span {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--color-primary);
-            border-radius: 50%;
-            opacity: 0.1;
-            animation: floatParticle 25s infinite linear;
-        }
-
-        .bg-particles span:nth-child(1) { left: 5%; animation-duration: 28s; animation-delay: 0s; }
-        .bg-particles span:nth-child(2) { left: 15%; animation-duration: 22s; animation-delay: 2s; width: 6px; height: 6px; }
-        .bg-particles span:nth-child(3) { left: 25%; animation-duration: 30s; animation-delay: 4s; }
-        .bg-particles span:nth-child(4) { left: 35%; animation-duration: 20s; animation-delay: 1s; width: 8px; height: 8px; }
-        .bg-particles span:nth-child(5) { left: 45%; animation-duration: 26s; animation-delay: 3s; }
-        .bg-particles span:nth-child(6) { left: 55%; animation-duration: 24s; animation-delay: 5s; width: 5px; height: 5px; }
-        .bg-particles span:nth-child(7) { left: 65%; animation-duration: 32s; animation-delay: 2s; }
-        .bg-particles span:nth-child(8) { left: 75%; animation-duration: 18s; animation-delay: 4s; width: 7px; height: 7px; }
-        .bg-particles span:nth-child(9) { left: 85%; animation-duration: 27s; animation-delay: 1s; }
-        .bg-particles span:nth-child(10) { left: 95%; animation-duration: 23s; animation-delay: 3s; }
-
-        @keyframes floatParticle {
-            0% { transform: translateY(100vh) rotate(0deg) scale(0); opacity: 0; }
-            10% { opacity: 0.1; }
-            90% { opacity: 0.1; }
-            100% { transform: translateY(-10vh) rotate(720deg) scale(1); opacity: 0; }
-        }
-
-        /* Gradiente de fundo animado */
-        .bg-gradient {
+        .bg-glow {
             position: fixed;
             top: -50%;
             left: -50%;
             width: 200%;
             height: 200%;
-            background: 
-                radial-gradient(ellipse at 20% 50%, rgba(108, 99, 255, 0.04) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 50%, rgba(255, 107, 107, 0.03) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 100%, rgba(0, 201, 167, 0.03) 0%, transparent 40%);
-            animation: bgFloat 30s ease-in-out infinite alternate;
-            z-index: 0;
+            background: radial-gradient(ellipse at 30% 40%, rgba(108,99,255,0.04) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 60%, rgba(255,107,107,0.02) 0%, transparent 50%);
             pointer-events: none;
+            z-index: 0;
+            animation: floatBg 40s ease-in-out infinite alternate;
         }
 
-        @keyframes bgFloat {
-            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-            33% { transform: translate(2%, -2%) rotate(1deg) scale(1.02); }
-            66% { transform: translate(-1%, 1%) rotate(-1deg) scale(0.98); }
-            100% { transform: translate(1%, -1%) rotate(0.5deg) scale(1.01); }
+        @keyframes floatBg {
+            0% { transform: translate(0,0) scale(1) rotate(0deg); }
+            100% { transform: translate(2%,-2%) scale(1.05) rotate(1deg); }
         }
 
-        .container {
-            max-width: 1440px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
+        .container { max-width: 1400px; margin:0 auto; position:relative; z-index:1; }
 
-        /* =============================================
-           HEADER ULTRA PREMIUM
-           ============================================= */
         .header {
-            background: var(--bg-header);
-            backdrop-filter: blur(var(--blur-amount));
-            -webkit-backdrop-filter: blur(var(--blur-amount));
-            border-radius: var(--card-radius);
-            padding: 1.5rem 2.5rem;
-            margin-bottom: 2.5rem;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--glass-border);
+            background: var(--bg-card);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: var(--radius);
+            padding: 1.2rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--glass);
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 1.5rem;
-            transition: all var(--transition-speed) ease;
+            gap: 1rem;
+            transition: all var(--transition);
             position: relative;
             overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-accent), var(--color-primary));
-            background-size: 300% 100%;
-            animation: gradientMove 4s ease-in-out infinite;
-        }
-
-        @keyframes gradientMove {
-            0% { background-position: 0% 0%; }
-            50% { background-position: 100% 0%; }
-            100% { background-position: 0% 0%; }
         }
 
         .header::after {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(108, 99, 255, 0.04) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+            top:0; left:0; right:0; height:3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+            background-size: 300% 100%;
+            animation: gradientMove 6s ease-in-out infinite;
         }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            position: relative;
-            z-index: 1;
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 0%; }
+            50% { background-position: 100% 0%; }
         }
 
-        .logo-wrapper {
+        .logo {
             display: flex;
             align-items: center;
             gap: 0.8rem;
         }
 
         .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--btn-primary-bg);
-            border-radius: 16px;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             color: white;
-            box-shadow: 0 4px 16px rgba(108, 99, 255, 0.3);
-            animation: pulseLogo 3s ease-in-out infinite;
-            position: relative;
+            box-shadow: 0 4px 16px rgba(108,99,255,0.25);
         }
 
-        .logo-icon::after {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-            opacity: 0.2;
-            z-index: -1;
-            animation: glowPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes glowPulse {
-            0%, 100% { transform: scale(1); opacity: 0.2; }
-            50% { transform: scale(1.1); opacity: 0.4; }
-        }
-
-        @keyframes pulseLogo {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .header-text h1 {
-            font-size: 1.8rem;
+        .logo h1 {
+            font-size: 1.5rem;
             font-weight: 900;
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.2;
         }
 
-        .header-text .subtitle {
-            color: var(--text-secondary);
+        .logo span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: block;
+            -webkit-text-fill-color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.6rem 1.4rem;
+            border: none;
+            border-radius: 50px;
+            font-family: var(--font);
+            font-weight: 700;
             font-size: 0.8rem;
-            font-weight: 500;
-            -webkit-text-fill-color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            background: var(--bg-card);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn:hover { transform: translateY(-2px) scale(1.02); box-shadow: var(--shadow); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(108,99,255,0.25);
+        }
+
+        .btn-primary:hover { box-shadow: 0 8px 32px rgba(108,99,255,0.35); }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #e55a5a);
+            color: white;
+            border: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+        }
+
+        .btn-outline.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-color: transparent;
+            color: white;
+        }
+
+        .btn-outline.admin-active {
+            background: linear-gradient(135deg, var(--warning), #f1902d);
+            border-color: transparent;
+            color: white;
+        }
+
+        .btn-theme {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-theme:hover { transform: rotate(20deg) scale(1.1); border-color: var(--primary); }
+
+        .admin-banner {
+            display: none;
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 2px solid var(--warning);
+            border-radius: 16px;
+            padding: 0.7rem 1.5rem;
+            margin-bottom: 2rem;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            animation: slideDown 0.5s var(--transition);
+        }
+
+        .admin-banner.show { display: flex; }
+
+        @keyframes slideDown {
+            from { opacity:0; transform:translateY(-16px); }
+            to { opacity:1; transform:translateY(0); }
+        }
+
+        .admin-badge {
+            background: var(--warning);
+            color: white;
+            padding: 0.15rem 1rem;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .admin-tag {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-tag span {
+            background: var(--bg);
+            padding: 0.1rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            padding: 1rem 1.2rem;
+            border-radius: 18px;
+            border: 1px solid var(--glass);
+            box-shadow: var(--shadow);
+            transition: all var(--transition);
+        }
+
+        .stat:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+        .stat .label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .stat .number {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-top: 0.1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .stat .number.green { color: var(--success); }
+        .stat .number.orange { color: var(--warning); }
+        .stat .number.purple { color: var(--primary); }
+
+        .filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.2rem;
+            border: 2px solid var(--border);
+            background: var(--bg-card);
+            border-radius: 50px;
+            font-family: var(--font);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .filter-btn:hover { transform: translateY(-2px); border-color: var(--primary); }
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-color: transparent;
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--glass);
+            box-shadow: var(--shadow);
+            transition: all var(--transition);
+            animation: fadeUp 0.6s var(--transition) forwards;
+            opacity: 0;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.02s; }
+        .card:nth-child(2) { animation-delay: 0.06s; }
+        .card:nth-child(3) { animation-delay: 0.10s; }
+        .card:nth-child(4) { animation-delay: 0.14s; }
+        .card:nth-child(5) { animation-delay: 0.18s; }
+        .card:nth-child(6) { animation-delay: 0.22s; }
+
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(24px); }
+            to { opacity:1; transform:translateY(0); }
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+            background: var(--bg-card-hover);
+        }
+
+        .card.hidden { display: none; }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .card-name {
+            font-weight: 800;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .header-text .subtitle .dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: var(--color-primary);
-            display: inline-block;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* =============================================
-           BOTÕES PREMIUM
-           ============================================= */
-        .btn {
-            padding: 0.7rem 1.6rem;
-            border: none;
+        .card-name .badge-id {
+            background: var(--border);
+            padding: 0.05rem 0.6rem;
             border-radius: 50px;
-            font-family: var(--font-primary);
+            font-size: 0.6rem;
             font-weight: 700;
-            font-size: 0.82rem;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.01em;
-            text-decoration: none;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), transparent);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .btn:hover::before {
-            opacity: 1;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn:active {
-            transform: scale(0.96) translateY(0);
-        }
-
-        .btn-primary {
-            background: var(--btn-primary-bg);
-            color: white;
-            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.3);
-        }
-
-        .btn-primary:hover {
-            background: var(--btn-primary-hover);
-            box-shadow: 0 8px 32px rgba(108, 99, 255, 0.4);
-        }
-
-        .btn-success {
-            background: var(--btn-success-bg);
-            color: white;
-            box-shadow: 0 4px 20px rgba(0, 201, 167, 0.3);
-        }
-
-        .btn-danger {
-            background: var(--btn-danger-bg);
-            color: white;
-            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
-        }
-
-        .btn-warning {
-            background: var(--btn-warning-bg);
-            color: white;
-            box-shadow: 0 4px 20px rgba(255, 159, 67, 0.3);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--border-color);
-            color: var(--text-secondary);
-        }
-
-        .btn-outline:hover {
-            background: var(--color-primary);
-            border-color: var(--color-primary);
-            color: white;
-            transform: translateY(-3px) scale(1.02);
-        }
-
-        .btn-outline.ativo {
-            background: var(--btn-primary-bg);
-            border-color: transparent;
-            color: white;
-            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.3);
-        }
-
-        .btn-outline.ativo-admin {
-            background: var(--btn-warning-bg);
-            border-color: transparent;
-            color: white;
-            box-shadow: 0 4px 20px rgba(255, 159, 67, 0.3);
-        }
-
-        .btn-theme {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 2px solid var(--border-color);
-            background: transparent;
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-theme:hover {
-            transform: rotate(30deg) scale(1.1);
-            border-color: var(--color-primary);
-            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.15);
-        }
-
-        /* =============================================
-           MODO ADMIN BADGE
-           ============================================= */
-        .modo-admin {
-            background: var(--bg-card);
-            backdrop-filter: blur(var(--blur-amount));
-            -webkit-backdrop-filter: blur(var(--blur-amount));
-            border: 2px solid var(--color-warning);
-            border-radius: 16px;
-            padding: 0.8rem 2rem;
-            display: none;
-            align-items: center;
-            gap: 1.2rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-            transition: all var(--transition-speed) ease;
-            box-shadow: var(--shadow-sm);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .modo-admin::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--color-warning), var(--color-accent));
-        }
-
-        .modo-admin.visivel {
-            display: flex;
-            animation: slideDown 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .modo-admin .badge-admin {
-            background: var(--btn-warning-bg);
-            color: white;
-            padding: 0.2rem 1.2rem;
-            border-radius: 50px;
-            font-size: 0.65rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        .modo-admin .admin-tag {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 0.85rem;
-        }
-
-        .modo-admin .admin-tag span {
-            background: var(--bg-primary);
-            padding: 0.2rem 0.8rem;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        /* =============================================
-           STATS DASHBOARD
-           ============================================= */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1.2rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-item {
-            background: var(--bg-card);
-            backdrop-filter: blur(var(--blur-amount));
-            -webkit-backdrop-filter: blur(var(--blur-amount));
-            padding: 1.2rem 1.5rem;
-            border-radius: 18px;
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-sm);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            overflow: hidden;
-            text-align: left;
-        }
-
-        .stat-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
-            opacity: 0.3;
-        }
-
-        .stat-item:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .stat-item .stat-icon {
-            font-size: 1.2rem;
-            margin-bottom: 0.3rem;
-            display: block;
-        }
-
-        .stat-item .label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
             color: var(--text-muted);
-            font-weight: 600;
-            display: block;
         }
 
-        .stat-item .numero {
-            font-size: 1.8rem;
-            font-weight: 900;
-            display: block;
-            margin-top: 0.2rem;
-            letter-spacing: -0.02em;
-        }
+        .card-actions { display: flex; gap: 0.3rem; }
 
-        .stat-item .numero.verde { color: var(--color-success); }
-        .stat-item .numero.laranja { color: var(--color-warning); }
-        .stat-item .numero.azul { color: var(--color-primary); }
-        .stat-item .numero.roxo { color: var(--color-primary-light); }
-
-        .stat-item .stat-trend {
-            font-size: 0.65rem;
-            font-weight: 600;
-            padding: 0.1rem 0.6rem;
-            border-radius: 50px;
-            display: inline-block;
-            margin-top: 0.2rem;
-        }
-
-        .stat-trend.up { background: var(--status-pago-bg); color: var(--color-success); }
-        .stat-trend.down { background: var(--status-pendente-bg); color: var(--color-warning); }
-
-        /* =============================================
-           FILTROS
-           ============================================= */
-        .filtros {
+        .parcela {
             display: flex;
-            gap: 0.6rem;
-            margin-bottom: 2.5rem;
-            flex-wrap: wrap;
-        }
-
-        .filtro-btn {
-            padding: 0.6rem 1.4rem;
-            border: 2px solid var(--border-color);
-            background: var(--bg-card);
-            backdrop-filter: blur(4px);
-            border-radius: 50px;
-            font-family: var(--font-primary);
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .filtro-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-            border-color: var(--color-primary);
-        }
-
-        .filtro-btn.ativo {
-            background: var(--btn-primary-bg);
-            border-color: transparent;
-            color: white;
-            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.25);
-        }
-
-        /* =============================================
-           GRID DE CLIENTES
-           ============================================= */
-        .clientes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.8rem;
-        }
-
-        /* =============================================
-           CARD DO CLIENTE ULTRA PREMIUM
-           ============================================= */
-        .cliente-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(var(--blur-amount));
-            -webkit-backdrop-filter: blur(var(--blur-amount));
-            border-radius: var(--card-radius);
-            padding: 1.8rem 1.5rem 1.5rem;
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-sm);
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            overflow: hidden;
-            animation: fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            opacity: 0;
-            cursor: default;
-        }
-
-        .cliente-card:nth-child(1) { animation-delay: 0.04s; }
-        .cliente-card:nth-child(2) { animation-delay: 0.08s; }
-        .cliente-card:nth-child(3) { animation-delay: 0.12s; }
-        .cliente-card:nth-child(4) { animation-delay: 0.16s; }
-        .cliente-card:nth-child(5) { animation-delay: 0.20s; }
-        .cliente-card:nth-child(6) { animation-delay: 0.24s; }
-        .cliente-card:nth-child(7) { animation-delay: 0.28s; }
-        .cliente-card:nth-child(8) { animation-delay: 0.32s; }
-        .cliente-card:nth-child(9) { animation-delay: 0.36s; }
-        .cliente-card:nth-child(10) { animation-delay: 0.40s; }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .cliente-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 20%, 
-                rgba(108, 99, 255, 0.03) 0%, 
-                transparent 60%);
-            pointer-events: none;
-            transition: opacity 0.6s ease;
-        }
-
-        .cliente-card::after {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            border-radius: var(--card-radius);
-            background: linear-gradient(135deg, 
-                var(--color-primary), 
-                transparent 40%, 
-                transparent 60%, 
-                var(--color-secondary));
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            z-index: -1;
-        }
-
-        .cliente-card:hover::after {
-            opacity: 0.15;
-        }
-
-        .cliente-card:hover {
-            transform: translateY(-8px) scale(1.01);
-            box-shadow: var(--shadow-xl);
-            background: var(--bg-card-hover);
-        }
-
-        .cliente-card:hover::before {
-            opacity: 1;
-        }
-
-        /* Borda colorida com glow por cliente */
-        .cliente-card[data-id="14"] { border-left: 4px solid #FF6B6B; }
-        .cliente-card[data-id="15"] { border-left: 4px solid #FF9F43; }
-        .cliente-card[data-id="16"] { border-left: 4px solid #00C9A7; }
-        .cliente-card[data-id="18"] { border-left: 4px solid #4ECDC4; }
-        .cliente-card[data-id="19"] { border-left: 4px solid #A29BFE; }
-        .cliente-card[data-id="20"] { border-left: 4px solid #FD79A8; }
-        .cliente-card[data-id="22"] { border-left: 4px solid #00B894; }
-        .cliente-card[data-id="23"] { border-left: 4px solid #FDCB6E; }
-        .cliente-card[data-id="25"] { border-left: 4px solid #6C5CE7; }
-        .cliente-card[data-id="26"] { border-left: 4px solid #00CEC9; }
-
-        .cliente-card.hidden { display: none; }
-
-        /* =============================================
-           HEADER DO CLIENTE
-           ============================================= */
-        .cliente-header {
-            display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.2rem;
-            padding-bottom: 0.8rem;
-            border-bottom: 2px solid var(--border-color);
+            padding: 0.5rem 0.8rem;
+            border-radius: 12px;
+            background: var(--bg);
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+            transition: all var(--transition);
+            border: 1px solid transparent;
         }
 
-        .cliente-nome {
-            font-size: 1.1rem;
+        .parcela:hover { border-color: var(--border); transform: translateX(3px); }
+
+        .parcela .valor { font-weight: 800; }
+        .parcela .data { color: var(--text-secondary); font-weight: 500; }
+
+        .status {
+            font-size: 0.55rem;
             font-weight: 800;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .cliente-nome .cliente-id {
-            background: var(--border-color);
-            color: var(--text-secondary);
             padding: 0.1rem 0.7rem;
             border-radius: 50px;
-            font-size: 0.65rem;
-            font-weight: 700;
-        }
-
-        .cliente-actions {
-            display: flex;
-            gap: 0.4rem;
-        }
-
-        .btn-acao {
-            padding: 0.3rem 0.8rem;
-            border: none;
-            border-radius: 30px;
-            font-family: var(--font-primary);
-            font-size: 0.7rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .btn-acao:hover { transform: scale(1.1); }
-
-        .btn-excluir {
-            background: var(--color-danger-bg);
-            color: var(--color-danger);
-        }
-
-        .btn-excluir:hover {
-            background: var(--color-danger);
-            color: white;
-        }
-
-        /* =============================================
-           PARCELAS
-           ============================================= */
-        .parcelas {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-        }
-
-        .parcela-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.6rem 1rem;
-            border-radius: 14px;
-            background: var(--bg-primary);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            font-size: 0.85rem;
-            border: 1px solid transparent;
-            position: relative;
-        }
-
-        .parcela-item:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--border-color);
-            transform: translateX(4px);
-        }
-
-        .parcela-item .valor {
-            font-weight: 800;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-        }
-
-        .parcela-item .data {
-            font-weight: 500;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-
-        .parcela-item .status {
-            font-size: 0.6rem;
-            font-weight: 800;
-            padding: 0.15rem 0.8rem;
-            border-radius: 50px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .status-pago {
-            background: var(--status-pago-bg);
-            color: var(--status-pago-text);
-        }
-
-        .status-pendente {
-            background: var(--status-pendente-bg);
-            color: var(--status-pendente-text);
-        }
-
-        /* =============================================
-           BOTÕES DE AÇÃO - PARCELAS
-           ============================================= */
-        .btn-acao-parcela {
-            border: none;
-            padding: 0.2rem 0.9rem;
-            border-radius: 50px;
-            font-family: var(--font-primary);
-            font-size: 0.6rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
 
-        .btn-acao-parcela:hover { transform: scale(1.08); }
+        .status.pago { background: rgba(0,201,167,0.12); color: var(--success); }
+        .status.pendente { background: rgba(255,159,67,0.12); color: var(--warning); }
 
-        .btn-pagar {
-            background: var(--status-pago-bg);
-            color: var(--status-pago-text);
+        .btn-parcela {
+            border: none;
+            padding: 0.1rem 0.7rem;
+            border-radius: 50px;
+            font-family: var(--font);
+            font-size: 0.55rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
-        .btn-pagar:hover {
-            box-shadow: 0 4px 16px rgba(0, 201, 167, 0.25);
-        }
+        .btn-parcela:hover { transform: scale(1.08); }
+        .btn-parcela.pagar { background: rgba(0,201,167,0.12); color: var(--success); }
+        .btn-parcela.desfazer { background: rgba(255,107,107,0.12); color: var(--danger); }
+        .btn-parcela.excluir { background: rgba(255,107,107,0.08); color: var(--danger); }
 
-        .btn-desfazer {
-            background: var(--color-danger-bg);
-            color: var(--color-danger);
-        }
-
-        .btn-desfazer:hover {
-            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.2);
-        }
-
-        .btn-acao-parcela:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* =============================================
-           TOAST NOTIFICATION
-           ============================================= */
         .toast {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            padding: 1rem 1.8rem;
+            padding: 0.8rem 1.5rem;
             border-radius: 18px;
             background: var(--bg-card);
-            backdrop-filter: blur(var(--blur-amount));
-            -webkit-backdrop-filter: blur(var(--blur-amount));
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-xl);
-            color: var(--text-primary);
-            font-weight: 600;
-            font-size: 0.9rem;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass);
+            box-shadow: var(--shadow-lg);
             display: flex;
             align-items: center;
-            gap: 1rem;
-            transform: translateY(100px) scale(0.9);
+            gap: 0.8rem;
+            transform: translateY(80px) scale(0.92);
             opacity: 0;
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.6s var(--transition);
             z-index: 2000;
-            max-width: 420px;
-            min-width: 280px;
+            max-width: 400px;
         }
 
-        .toast.visivel {
+        .toast.show {
             transform: translateY(0) scale(1);
             opacity: 1;
         }
 
-        .toast .toast-icon {
-            font-size: 1.8rem;
-            line-height: 1;
-        }
+        .toast .icon { font-size: 1.6rem; line-height:1; }
+        .toast .msg { font-weight: 600; font-size:0.9rem; }
 
-        .toast .toast-content {
-            flex: 1;
-        }
-
-        .toast .toast-title {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--text-muted);
-            font-weight: 700;
-        }
-
-        .toast .toast-message {
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .toast-success .toast-icon { color: var(--color-success); }
-        .toast-error .toast-icon { color: var(--color-danger); }
-        .toast-info .toast-icon { color: var(--color-primary); }
-
-        /* =============================================
-           MODAL PREMIUM
-           ============================================= */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(12px);
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            animation: fadeInModal 0.4s ease;
+            animation: fadeModal 0.4s ease;
         }
 
-        @keyframes fadeInModal {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .modal.show { display: flex; }
+
+        @keyframes fadeModal {
+            from { opacity:0; }
+            to { opacity:1; }
         }
 
-        .modal.visivel { display: flex; }
-
-        .modal-content {
-            background: var(--bg-secondary);
-            border-radius: var(--card-radius);
-            padding: 2.5rem;
+        .modal-box {
+            background: var(--bg-card);
+            backdrop-filter: blur(24px);
+            border-radius: var(--radius);
+            padding: 2rem;
             max-width: 480px;
-            width: 90%;
-            box-shadow: var(--shadow-xl);
-            animation: slideUpModal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border: 1px solid var(--glass-border);
-            position: relative;
-            overflow: hidden;
+            width: 92%;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--glass);
+            animation: slideModal 0.5s var(--transition);
         }
 
-        .modal-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+        @keyframes slideModal {
+            from { opacity:0; transform:translateY(30px) scale(0.96); }
+            to { opacity:1; transform:translateY(0) scale(1); }
         }
 
-        @keyframes slideUpModal {
-            from { opacity: 0; transform: translateY(40px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        .modal-box h2 { font-size:1.4rem; font-weight:800; margin-bottom:0.2rem; }
+        .modal-box .sub { color:var(--text-secondary); margin-bottom:1.2rem; font-size:0.9rem; }
+
+        .modal-box label { display:block; font-weight:700; font-size:0.8rem; margin-bottom:0.2rem; }
+        .modal-box input {
+            width:100%;
+            padding:0.7rem 1rem;
+            border:2px solid var(--border);
+            border-radius:12px;
+            font-family:var(--font);
+            font-size:0.95rem;
+            background:var(--bg);
+            color:var(--text);
+            margin-bottom:1rem;
+            transition:all 0.3s ease;
         }
 
-        .modal-content h2 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 0.3rem;
-        }
-
-        .modal-content .subtitulo {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-        }
-
-        .modal-content label {
-            display: block;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.3rem;
-            font-size: 0.85rem;
-        }
-
-        .modal-content input {
-            width: 100%;
-            padding: 0.8rem 1.2rem;
-            border: 2px solid var(--border-color);
-            border-radius: 14px;
-            font-family: var(--font-primary);
-            font-size: 1rem;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            margin-bottom: 1.2rem;
-            transition: all 0.3s ease;
-        }
-
-        .modal-content input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.08);
-        }
-
-        .modal-content .erro {
-            color: var(--color-danger);
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .modal-content .erro.visivel {
-            display: block;
-            animation: shake 0.4s ease;
-        }
+        .modal-box input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 4px rgba(108,99,255,0.08); }
+        .modal-box .error { color:var(--danger); font-size:0.85rem; display:none; margin-bottom:0.8rem; }
+        .modal-box .error.show { display:block; animation:shake 0.4s ease; }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-8px); }
-            40% { transform: translateX(8px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
+            0%,100%{transform:translateX(0)}
+            25%{transform:translateX(-6px)}
+            75%{transform:translateX(6px)}
         }
 
-        .modal-actions {
-            display: flex;
-            gap: 0.8rem;
-            justify-content: flex-end;
-            margin-top: 0.5rem;
-        }
-
-        .modal-actions .btn {
-            padding: 0.7rem 2rem;
-        }
-
-        .btn-secondary {
-            background: var(--border-color);
-            color: var(--text-secondary);
-        }
-
-        .btn-secondary:hover {
-            background: var(--text-muted);
-            color: white;
-        }
-
-        /* =============================================
-           SCROLLBAR
-           ============================================= */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-primary); }
-        ::-webkit-scrollbar-thumb {
-            background: var(--color-primary);
-            border-radius: 10px;
-            opacity: 0.3;
-        }
-        ::-webkit-scrollbar-thumb:hover { opacity: 0.6; }
-
-        /* =============================================
-           RESPONSIVO
-           ============================================= */
-        @media (max-width: 992px) {
-            .clientes-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; }
-        }
+        .modal-actions { display:flex; gap:0.6rem; justify-content:flex-end; margin-top:0.5rem; }
 
         @media (max-width: 768px) {
-            body { padding: 1rem; }
-            
-            .header {
-                padding: 1.2rem 1.5rem;
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .header-left .logo-icon { width: 40px; height: 40px; font-size: 1.3rem; }
-            .header-text h1 { font-size: 1.4rem; }
-            .header-actions { justify-content: center; gap: 0.4rem; }
-
-            .btn { padding: 0.5rem 1rem; font-size: 0.75rem; }
-            .btn-theme { width: 38px; height: 38px; font-size: 1rem; }
-
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.8rem;
-            }
-            .stat-item { padding: 0.8rem 1rem; }
-            .stat-item .numero { font-size: 1.4rem; }
-
-            .clientes-grid { grid-template-columns: 1fr; gap: 1rem; }
-            .cliente-card { padding: 1.2rem; }
-
-            .modal-content { padding: 1.5rem; margin: 1rem; }
-            .modo-admin { padding: 0.6rem 1.2rem; font-size: 0.8rem; gap: 0.5rem; }
-
-            .parcela-item {
-                font-size: 0.75rem;
-                padding: 0.4rem 0.8rem;
-                flex-wrap: wrap;
-                gap: 0.3rem;
-            }
-            .parcela-item .valor { font-size: 0.8rem; }
-
-            .toast {
-                bottom: 1rem;
-                right: 1rem;
-                left: 1rem;
-                max-width: none;
-                min-width: auto;
-                padding: 0.8rem 1.2rem;
-            }
+            body { padding:1rem; }
+            .header { padding:1rem 1.2rem; flex-direction:column; align-items:stretch; }
+            .header-actions { justify-content:center; }
+            .stats { grid-template-columns:repeat(2,1fr); }
+            .grid { grid-template-columns:1fr; }
+            .modal-box { padding:1.5rem; margin:1rem; }
+            .toast { bottom:1rem; right:1rem; left:1rem; max-width:none; }
         }
 
         @media (max-width: 480px) {
-            .stats { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-            .stat-item .numero { font-size: 1.2rem; }
-            .stat-item .label { font-size: 0.6rem; }
-            .header-text h1 { font-size: 1.1rem; }
-            .header-text .subtitle { font-size: 0.7rem; }
-            .btn { font-size: 0.65rem; padding: 0.3rem 0.7rem; }
-            .filtro-btn { font-size: 0.7rem; padding: 0.4rem 0.9rem; }
+            .stats { grid-template-columns:1fr 1fr; gap:0.5rem; }
+            .stat .number { font-size:1.3rem; }
+            .logo h1 { font-size:1.2rem; }
+            .btn { font-size:0.7rem; padding:0.4rem 0.9rem; }
+            .filter-btn { font-size:0.7rem; padding:0.3rem 0.9rem; }
+        }
+
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-track { background:var(--bg); }
+        ::-webkit-scrollbar-thumb { background:var(--primary); border-radius:10px; opacity:0.3; }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .sync-status {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: var(--bg-card);
+            padding: 0.2rem 0.8rem;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+        }
+
+        .sync-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        .sync-status .dot.online { background: var(--success); }
+        .sync-status .dot.offline { background: var(--danger); animation: none; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
         }
     </style>
 </head>
 <body>
-    <!-- PARTÍCULAS DE FUNDO -->
-    <div class="bg-particles">
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-    </div>
-    <div class="bg-gradient"></div>
-
+    <div class="bg-glow"></div>
     <div class="container">
-        <!-- HEADER ULTRA PREMIUM -->
+
+        <!-- HEADER -->
         <header class="header">
-            <div class="header-left">
-                <div class="logo-wrapper">
-                    <div class="logo-icon">💰</div> <!-- Mudado de 💎 para 💰 -->
-                    <div class="header-text">
-                        <h1>Fernando e Kevin Pro -Amigos Atleticanos </h1>
-                        <span class="subtitle">
-                            <span>Gestão de Pagamentos</span>
-                            <span class="dot"></span>
-                            <span>Premium</span>
-                        </span>
-                    </div>
+            <div class="logo">
+                <div class="logo-icon">💰</div>
+                <div>
+                    <h1>Fernando e Kevin (Amigos Atleticanos) Pro</h1>
+                    <span>Gestão de Pagamentos • Premium</span>
                 </div>
             </div>
             <div class="header-actions">
-                <button class="btn-theme" id="btnTheme" title="Alternar tema">🌙</button>
-                <button class="btn btn-outline ativo" id="btnModoConvidado">🧑‍💼 Kevin</button> <!-- Mudado de 👀 Convidado para 🧑‍💼 Kevin -->
-                <button class="btn btn-outline" id="btnModoAdmin">👨‍💼 Admin</button>
+                <button class="btn-theme" id="btnTheme">🌙</button>
+                <button class="btn btn-outline active" id="btnModoConvidado">👤 Convidado</button>
+                <button class="btn btn-outline" id="btnModoAdmin">🔒 Admin</button>
                 <button class="btn btn-primary" id="btnNovoCliente" style="display:none;">➕ Novo</button>
                 <button class="btn btn-danger" id="btnSairAdmin" style="display:none;">🚪 Sair</button>
+                <span class="sync-status" id="syncStatus">
+                    <span class="dot online" id="statusDot"></span>
+                    <span id="statusText">Online</span>
+                </span>
             </div>
         </header>
 
-        <!-- MODO ADMIN -->
-        <div class="modo-admin" id="modoAdmin">
-            <span class="badge-admin">🔒 Admin</span>
+        <!-- ADMIN BANNER -->
+        <div class="admin-banner" id="adminBanner">
+            <span class="admin-badge">🔑 Admin</span>
             <div class="admin-tag">
-                <span>✅ Marcar pagos</span>
+                <span>✅ Pagar</span>
                 <span>↩️ Desfazer</span>
                 <span>➕ Adicionar</span>
                 <span>🗑️ Excluir</span>
             </div>
         </div>
 
-        <!-- STATS DASHBOARD -->
+        <!-- STATS -->
         <div class="stats">
-            <div class="stat-item">
-                <span class="stat-icon">📊</span>
-                <span class="label">Total Parcelas</span>
-                <span class="numero azul" id="totalParcelas">0</span>
-                <span class="stat-trend up">↑ Ativo</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-icon">✅</span>
-                <span class="label">Pagas</span>
-                <span class="numero verde" id="totalPagos">0</span>
-                <span class="stat-trend up">↑ Concluídas</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-icon">⏳</span>
-                <span class="label">Pendentes</span>
-                <span class="numero laranja" id="totalPendentes">0</span>
-                <span class="stat-trend down">↓ Aguardando</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-icon">👤</span>
-                <span class="label">Clientes</span>
-                <span class="numero roxo" id="totalClientes">0</span>
-                <span class="stat-trend up">↑ Ativos</span>
-            </div>
+            <div class="stat"><span class="label">📊 Total Parcelas</span><div class="number purple" id="totalParcelas">0</div></div>
+            <div class="stat"><span class="label">✅ Pagas</span><div class="number green" id="totalPagos">0</div></div>
+            <div class="stat"><span class="label">⏳ Pendentes</span><div class="number orange" id="totalPendentes">0</div></div>
+            <div class="stat"><span class="label">👤 Clientes</span><div class="number purple" id="totalClientes">0</div></div>
         </div>
 
-        <!-- FILTROS -->
-        <div class="filtros">
-            <button class="filtro-btn ativo" data-filtro="todos">📋 Todos</button>
-            <button class="filtro-btn" data-filtro="pagos">✅ Pagos</button>
-            <button class="filtro-btn" data-filtro="pendentes">⏳ Pendentes</button>
+        <!-- FILTERS -->
+        <div class="filters">
+            <button class="filter-btn active" data-filter="todos">📋 Todos</button>
+            <button class="filter-btn" data-filter="pagos">✅ Pagos</button>
+            <button class="filter-btn" data-filter="pendentes">⏳ Pendentes</button>
         </div>
 
         <!-- GRID -->
-        <div class="clientes-grid" id="clientesGrid"></div>
-    </div>
-
-    <!-- TOAST -->
-    <div class="toast" id="toast">
-        <span class="toast-icon">✅</span>
-        <div class="toast-content">
-            <div class="toast-title">Notificação</div>
-            <div class="toast-message" id="toastMessage">Ação realizada com sucesso!</div>
+        <div class="grid" id="grid">
+            <div class="loading">🔄 Carregando dados do Firebase...</div>
         </div>
     </div>
 
+    <!-- TOAST -->
+    <div class="toast" id="toast"><span class="icon">✅</span><span class="msg" id="toastMsg">Sucesso!</span></div>
+
     <!-- MODAL LOGIN -->
     <div class="modal" id="modalLogin">
-        <div class="modal-content">
+        <div class="modal-box">
             <h2>🔒 Acesso Admin</h2>
-            <p class="subtitulo">Digite a senha para acessar o modo administrador</p>
-
-            <label for="senhaLogin">Senha:</label>
-            <input type="password" id="senhaLogin" placeholder="Digite a senha" />
-
-            <div class="erro" id="erroLogin">❌ Senha incorreta. Tente novamente.</div>
-
+            <p class="sub">Digite a senha para ativar o modo administrador</p>
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha" placeholder="Digite a senha" />
+            <div class="error" id="erroLogin">❌ Senha incorreta</div>
             <div class="modal-actions">
-                <button class="btn btn-secondary" id="btnCancelarLogin">Cancelar</button>
+                <button class="btn" id="btnCancelarLogin">Cancelar</button>
                 <button class="btn btn-primary" id="btnConfirmarLogin">Entrar</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL NOVO CLIENTE -->
-    <div class="modal" id="modalNovoCliente">
-        <div class="modal-content">
+    <div class="modal" id="modalNovo">
+        <div class="modal-box">
             <h2>➕ Novo Cliente</h2>
-            <p class="subtitulo">Preencha os dados para adicionar um novo cliente</p>
-
+            <p class="sub">Preencha os dados para adicionar um cliente</p>
             <label for="novoId">Número do Cliente:</label>
             <input type="number" id="novoId" placeholder="Ex: 27" min="1" />
-
             <label for="novoValor">Valor da Parcela (R$):</label>
-            <input type="number" id="novoValor" placeholder="600" value="600" />
-
-            <label for="novaDataInicial">Data da 1ª Parcela:</label>
-            <input type="date" id="novaDataInicial" />
-
-            <label for="numParcelas">Quantas parcelas?</label>
-            <input type="number" id="numParcelas" placeholder="4" value="4" min="1" />
-
+            <input type="number" id="novoValor" value="600" />
+            <label for="novaData">Data da 1ª Parcela:</label>
+            <input type="date" id="novaData" />
+            <label for="numParcelas">Quantas Parcelas?</label>
+            <input type="number" id="numParcelas" value="4" min="1" />
             <div class="modal-actions">
-                <button class="btn btn-secondary" id="btnCancelarModal">Cancelar</button>
-                <button class="btn btn-primary" id="btnSalvarCliente">Salvar</button>
+                <button class="btn" id="btnCancelarNovo">Cancelar</button>
+                <button class="btn btn-primary" id="btnSalvarNovo">Salvar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // =============================================
-        // CONFIGURAÇÃO
-        // =============================================
-        const SENHA_ADMIN = 'admin123';
+        // ============================================
+        // 🔥 CONFIGURAÇÃO DO FIREBASE
+        // Seus dados que você me enviou!
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDZ_YANKeSXOGjO8DXGj_xVOWYXPlyaERo",
+            authDomain: "financas-sitegratis.firebaseapp.com",
+            projectId: "financas-sitegratis",
+            storageBucket: "financas-sitegratis.firebasestorage.app",
+            messagingSenderId: "91911213268",
+            appId: "1:91911213268:web:2a3a9dc45c13f2611aab41"
+        };
 
-        // =============================================
-        // DADOS
-        // =============================================
-        const dadosIniciais = {
-            clientes: [
+        // ============================================
+        // INICIALIZAÇÃO DO FIREBASE
+        // ============================================
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // ============================================
+        // ESTADO
+        // ============================================
+        let clientesAtuais = [];
+        let modoAdmin = false;
+        let filtro = 'todos';
+        let tema = localStorage.getItem('payflow-theme') || 'light';
+        let carregando = true;
+
+        // ============================================
+        // TEMA
+        // ============================================
+        function setTema(t) {
+            document.documentElement.setAttribute('data-theme', t);
+            document.getElementById('btnTheme').textContent = t === 'dark' ? '☀️' : '🌙';
+            localStorage.setItem('payflow-theme', t);
+            tema = t;
+        }
+        setTema(tema);
+        document.getElementById('btnTheme').addEventListener('click', () => setTema(tema === 'light' ? 'dark' : 'light'));
+
+        // ============================================
+        // TOAST
+        // ============================================
+        let toastTimer = null;
+        function toast(msg, icon = '✅') {
+            const el = document.getElementById('toast');
+            const msgEl = document.getElementById('toastMsg');
+            msgEl.textContent = msg;
+            el.querySelector('.icon').textContent = icon;
+            el.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+        }
+
+        // ============================================
+        // STATUS DE CONEXÃO
+        // ============================================
+        function atualizarStatus(online) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            if (online) {
+                dot.className = 'dot online';
+                text.textContent = 'Online';
+            } else {
+                dot.className = 'dot offline';
+                text.textContent = 'Offline';
+            }
+        }
+
+        database.ref('.info/connected').on('value', (snap) => {
+            atualizarStatus(snap.val());
+        });
+
+        // ============================================
+        // 🔥 OUVINTE EM TEMPO REAL - O SEGREDO!
+        // Isso faz as atualizações aparecerem para todos
+        // ============================================
+        function iniciarListener() {
+            const clientesRef = database.ref('clientes');
+            
+            clientesRef.on('value', function(snapshot) {
+                const dados = snapshot.val();
+                carregando = false;
+                
+                if (dados) {
+                    // Converte o objeto do Firebase para array
+                    clientesAtuais = Object.keys(dados).map(key => {
+                        return {
+                            id: dados[key].id,
+                            parcelas: dados[key].parcelas || [],
+                            pagas: dados[key].pagas || [],
+                            _firebaseKey: key
+                        };
+                    });
+                } else {
+                    clientesAtuais = [];
+                    // Se não tiver dados, cria os dados iniciais
+                    criarDadosIniciais();
+                }
+                
+                renderizar();
+            }, function(error) {
+                console.error('Erro no listener:', error);
+                toast('Erro ao conectar com Firebase ❌', '❌');
+                carregando = false;
+                renderizar();
+            });
+        }
+
+        // ============================================
+        // CRIAR DADOS INICIAIS NO FIREBASE
+        // ============================================
+        function criarDadosIniciais() {
+            const dadosIniciais = [
                 { id: 14, parcelas: ['26/06', '03/07', '10/07', '17/07'], pagas: [] },
                 { id: 15, parcelas: ['25/06', '02/07', '09/07', '16/07'], pagas: [] },
                 { id: 16, parcelas: ['15/06', '22/06', '29/06', '06/07'], pagas: [0] },
@@ -1332,185 +826,90 @@
                 { id: 23, parcelas: ['21/06', '28/06', '05/07', '12/07'], pagas: [] },
                 { id: 25, parcelas: ['20/06', '27/06', '04/07', '11/07'], pagas: [0] },
                 { id: 26, parcelas: ['17/06', '24/06', '01/07', '08/07'], pagas: [0] }
-            ]
-        };
+            ];
 
-        // =============================================
-        // ESTADO
-        // =============================================
-        let dados = JSON.parse(localStorage.getItem('dadosPagamentos')) || dadosIniciais;
-        let modoAdmin = false;
-        let filtroAtual = 'todos';
-        let theme = localStorage.getItem('theme') || 'light';
-        let toastTimeout = null;
+            const clientesRef = database.ref('clientes');
+            dadosIniciais.forEach(cliente => {
+                clientesRef.push(cliente);
+            });
 
-        // =============================================
-        // TEMA
-        // =============================================
-        function aplicarTema(tema) {
-            document.documentElement.setAttribute('data-theme', tema);
-            document.getElementById('btnTheme').textContent = tema === 'dark' ? '☀️' : '🌙';
-            localStorage.setItem('theme', tema);
-            theme = tema;
+            toast('📦 Dados iniciais criados no Firebase!', '📦');
         }
 
-        document.getElementById('btnTheme').addEventListener('click', () => {
-            const novo = theme === 'light' ? 'dark' : 'light';
-            aplicarTema(novo);
-        });
-
-        aplicarTema(theme);
-
-        // =============================================
-        // TOAST NOTIFICATION
-        // =============================================
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            const icon = toast.querySelector('.toast-icon');
-
-            if (toastTimeout) {
-                clearTimeout(toastTimeout);
-                toastTimeout = null;
-            }
-
-            toast.className = 'toast';
-            if (type === 'success') {
-                toast.classList.add('toast-success');
-                icon.textContent = '✅';
-                document.querySelector('.toast-title').textContent = 'Sucesso';
-            } else if (type === 'error') {
-                toast.classList.add('toast-error');
-                icon.textContent = '❌';
-                document.querySelector('.toast-title').textContent = 'Erro';
-            } else {
-                toast.classList.add('toast-info');
-                icon.textContent = 'ℹ️';
-                document.querySelector('.toast-title').textContent = 'Informação';
-            }
-
-            toastMessage.textContent = message;
-            toast.classList.add('visivel');
-
-            toastTimeout = setTimeout(() => {
-                toast.classList.remove('visivel');
-                toastTimeout = null;
-            }, 3500);
-        }
-
-        // =============================================
-        // FUNÇÕES AUXILIARES
-        // =============================================
-        function salvarDados() {
-            localStorage.setItem('dadosPagamentos', JSON.stringify(dados));
-        }
-
-        function gerarDatas(dataInicial, quantidade) {
-            const datas = [];
-            const data = new Date(dataInicial);
-            for (let i = 0; i < quantidade; i++) {
-                const dia = String(data.getDate()).padStart(2, '0');
-                const mes = String(data.getMonth() + 1).padStart(2, '0');
-                datas.push(`${dia}/${mes}`);
-                data.setDate(data.getDate() + 7);
-            }
-            return datas;
-        }
-
-        function obterProximoId() {
-            const ids = dados.clientes.map(c => c.id);
-            let novoId = 1;
-            while (ids.includes(novoId)) novoId++;
-            return novoId;
-        }
-
-        // =============================================
-        // RENDERIZAÇÃO
-        // =============================================
+        // ============================================
+        // RENDERIZAR
+        // ============================================
         function renderizar() {
-            const grid = document.getElementById('clientesGrid');
+            const grid = document.getElementById('grid');
+            
+            if (carregando) {
+                grid.innerHTML = '<div class="loading">🔄 Carregando dados do Firebase...</div>';
+                return;
+            }
+
             grid.innerHTML = '';
 
-            const clientesOrdenados = [...dados.clientes].sort((a, b) => a.id - b.id);
+            let lista = [...clientesAtuais].sort((a, b) => a.id - b.id);
 
-            let clientesFiltrados = clientesOrdenados;
-            if (filtroAtual === 'pagos') {
-                clientesFiltrados = clientesOrdenados.filter(c => c.pagas && c.pagas.length > 0);
-            } else if (filtroAtual === 'pendentes') {
-                clientesFiltrados = clientesOrdenados.filter(c => {
-                    const totalParcelas = c.parcelas.length;
-                    const pagas = c.pagas ? c.pagas.length : 0;
-                    return pagas < totalParcelas;
-                });
-            }
+            if (filtro === 'pagos') lista = lista.filter(c => c.pagas && c.pagas.length > 0);
+            else if (filtro === 'pendentes') lista = lista.filter(c => {
+                const total = c.parcelas.length;
+                const pagas = c.pagas ? c.pagas.length : 0;
+                return pagas < total;
+            });
 
-            let totalParcelas = 0,
-                totalPagos = 0,
-                totalPendentes = 0;
+            let totalParcelas = 0, totalPagos = 0, totalPendentes = 0;
 
-            clientesFiltrados.forEach(cliente => {
+            lista.forEach(cliente => {
                 const total = cliente.parcelas.length;
                 const pagas = cliente.pagas ? cliente.pagas.length : 0;
                 const pendentes = total - pagas;
-
                 totalParcelas += total;
                 totalPagos += pagas;
                 totalPendentes += pendentes;
 
                 const card = document.createElement('div');
-                card.className = 'cliente-card';
-                card.dataset.id = cliente.id;
+                card.className = 'card';
 
                 let parcelasHTML = '';
-                cliente.parcelas.forEach((data, index) => {
-                    const isPago = cliente.pagas && cliente.pagas.includes(index);
-                    const statusClass = isPago ? 'status-pago' : 'status-pendente';
-                    const statusText = isPago ? '✅ Pago' : '⏳ Pendente';
+                cliente.parcelas.forEach((data, i) => {
+                    const pago = cliente.pagas && cliente.pagas.includes(i);
+                    const statusClass = pago ? 'pago' : 'pendente';
+                    const statusText = pago ? '✅ Pago' : '⏳ Pendente';
 
-                    let acaoHTML = '';
+                    let acao = '';
                     if (modoAdmin) {
-                        if (isPago) {
-                            acaoHTML =
-                                `<button class="btn-acao-parcela btn-desfazer" data-cliente="${cliente.id}" data-index="${index}" data-acao="desfazer">↩️ Desfazer</button>`;
+                        if (pago) {
+                            acao = `<button class="btn-parcela desfazer" data-key="${cliente._firebaseKey}" data-index="${i}">↩️</button>`;
                         } else {
-                            acaoHTML =
-                                `<button class="btn-acao-parcela btn-pagar" data-cliente="${cliente.id}" data-index="${index}" data-acao="pagar">✓ Pago</button>`;
+                            acao = `<button class="btn-parcela pagar" data-key="${cliente._firebaseKey}" data-index="${i}">✓</button>`;
                         }
                     } else {
-                        acaoHTML = `<span style="font-size:0.6rem;color:var(--text-muted);">${isPago ? '✅' : '⏳'}</span>`;
+                        acao = `<span style="font-size:0.6rem;color:var(--text-muted);">${pago ? '✅' : '⏳'}</span>`;
                     }
 
                     parcelasHTML += `
-                            <div class="parcela-item">
-                                <span class="valor">R$ 600</span>
-                                <span class="data">${data}</span>
-                                <span class="status ${statusClass}">${statusText}</span>
-                                ${acaoHTML}
-                            </div>
-                        `;
+                        <div class="parcela">
+                            <span class="valor">R$ 600</span>
+                            <span class="data">${data}</span>
+                            <span class="status ${statusClass}">${statusText}</span>
+                            ${acao}
+                        </div>
+                    `;
                 });
 
                 let adminActions = '';
                 if (modoAdmin) {
-                    adminActions = `
-                            <button class="btn-acao btn-excluir" data-cliente="${cliente.id}">🗑️</button>
-                        `;
+                    adminActions = `<button class="btn-parcela excluir" data-key="${cliente._firebaseKey}">🗑️</button>`;
                 }
 
                 card.innerHTML = `
-                        <div class="cliente-header">
-                            <span class="cliente-nome">
-                                👤 Freguês bom ${cliente.id}
-                                <span class="cliente-id">${cliente.parcelas.length}p</span>
-                            </span>
-                            <div class="cliente-actions">
-                                ${adminActions}
-                            </div>
-                        </div>
-                        <div class="parcelas">
-                            ${parcelasHTML}
-                        </div>
-                    `;
+                    <div class="card-header">
+                        <span class="card-name">👤 Cliente ${cliente.id} <span class="badge-id">${cliente.parcelas.length}p</span></span>
+                        <div class="card-actions">${adminActions}</div>
+                    </div>
+                    <div>${parcelasHTML}</div>
+                `;
 
                 grid.appendChild(card);
             });
@@ -1518,109 +917,114 @@
             document.getElementById('totalParcelas').textContent = totalParcelas;
             document.getElementById('totalPagos').textContent = totalPagos;
             document.getElementById('totalPendentes').textContent = totalPendentes;
-            document.getElementById('totalClientes').textContent = clientesFiltrados.length;
+            document.getElementById('totalClientes').textContent = lista.length;
 
-            // Eventos
-            document.querySelectorAll('.btn-acao-parcela').forEach(btn => {
-                btn.addEventListener('click', function(e) {
+            // Eventos dos botões
+            document.querySelectorAll('.btn-parcela.pagar').forEach(b => {
+                b.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const clienteId = parseInt(this.dataset.cliente);
-                    const index = parseInt(this.dataset.index);
-                    const acao = this.dataset.acao;
-
-                    if (acao === 'pagar') {
-                        marcarPago(clienteId, index);
-                    } else if (acao === 'desfazer') {
-                        desfazerPago(clienteId, index);
+                    const key = b.dataset.key;
+                    const idx = parseInt(b.dataset.index);
+                    const cliente = clientesAtuais.find(c => c._firebaseKey === key);
+                    if (!cliente) return;
+                    if (!cliente.pagas) cliente.pagas = [];
+                    if (!cliente.pagas.includes(idx)) {
+                        cliente.pagas.push(idx);
+                        cliente.pagas.sort((a,b) => a-b);
+                        // Salva no Firebase
+                        database.ref('clientes/' + key + '/pagas').set(cliente.pagas);
+                        toast(`Parcela ${idx+1} do cliente ${cliente.id} paga ✅`);
                     }
                 });
             });
 
-            document.querySelectorAll('.btn-excluir').forEach(btn => {
-                btn.addEventListener('click', function(e) {
+            document.querySelectorAll('.btn-parcela.desfazer').forEach(b => {
+                b.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const clienteId = parseInt(this.dataset.cliente);
-                    if (confirm(`Excluir Freguês bom ${clienteId}?`)) {
-                        excluirCliente(clienteId);
+                    const key = b.dataset.key;
+                    const idx = parseInt(b.dataset.index);
+                    const cliente = clientesAtuais.find(c => c._firebaseKey === key);
+                    if (!cliente) return;
+                    if (!cliente.pagas) cliente.pagas = [];
+                    if (cliente.pagas.includes(idx)) {
+                        cliente.pagas = cliente.pagas.filter(i => i !== idx);
+                        database.ref('clientes/' + key + '/pagas').set(cliente.pagas);
+                        toast(`Parcela ${idx+1} do cliente ${cliente.id} pendente ↩️`, '↩️');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.btn-parcela.excluir').forEach(b => {
+                b.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const key = b.dataset.key;
+                    const cliente = clientesAtuais.find(c => c._firebaseKey === key);
+                    if (!cliente) return;
+                    if (confirm(`Excluir Cliente ${cliente.id}?`)) {
+                        database.ref('clientes/' + key).remove();
+                        toast(`Cliente ${cliente.id} removido 🗑️`, '🗑️');
                     }
                 });
             });
         }
 
-        // =============================================
-        // AÇÕES
-        // =============================================
-        function marcarPago(clienteId, index) {
-            const cliente = dados.clientes.find(c => c.id === clienteId);
-            if (!cliente) return;
-            if (!cliente.pagas) cliente.pagas = [];
-            if (!cliente.pagas.includes(index)) {
-                cliente.pagas.push(index);
-                cliente.pagas.sort((a, b) => a - b);
-                salvarDados();
-                renderizar();
-                showToast(`Parcela ${index+1} do cliente ${clienteId} marcada como PAGA ✅`, 'success');
+        // ============================================
+        // ADICIONAR CLIENTE
+        // ============================================
+        function adicionarCliente(id, dataInicial, qtd) {
+            const datas = [];
+            const d = new Date(dataInicial);
+            for (let i=0; i<qtd; i++) {
+                const dia = String(d.getDate()).padStart(2,'0');
+                const mes = String(d.getMonth()+1).padStart(2,'0');
+                datas.push(`${dia}/${mes}`);
+                d.setDate(d.getDate() + 7);
             }
+            
+            const novoCliente = {
+                id: id,
+                parcelas: datas,
+                pagas: []
+            };
+            
+            database.ref('clientes').push(novoCliente);
+            toast(`Cliente ${id} adicionado ✅`);
         }
 
-        function desfazerPago(clienteId, index) {
-            const cliente = dados.clientes.find(c => c.id === clienteId);
-            if (!cliente) return;
-            if (!cliente.pagas) cliente.pagas = [];
-
-            if (cliente.pagas.includes(index)) {
-                cliente.pagas = cliente.pagas.filter(i => i !== index);
-                cliente.pagas.sort((a, b) => a - b);
-                salvarDados();
-                renderizar();
-                showToast(`Parcela ${index+1} do cliente ${clienteId} voltou para PENDENTE ↩️`, 'info');
-            }
+        function proximoId() {
+            const ids = clientesAtuais.map(c => c.id);
+            let n = 1;
+            while (ids.includes(n)) n++;
+            return n;
         }
 
-        function excluirCliente(clienteId) {
-            dados.clientes = dados.clientes.filter(c => c.id !== clienteId);
-            salvarDados();
-            renderizar();
-            showToast(`Cliente ${clienteId} removido com sucesso 🗑️`, 'info');
-        }
-
-        function adicionarCliente(id, valor, dataInicial, numParcelas) {
-            const datas = gerarDatas(dataInicial, numParcelas);
-            dados.clientes.push({ id, parcelas: datas, pagas: [] });
-            dados.clientes.sort((a, b) => a.id - b.id);
-            salvarDados();
-            renderizar();
-            showToast(`Cliente ${id} adicionado com sucesso ✅`, 'success');
-        }
-
-        // =============================================
+        // ============================================
         // MODAL LOGIN
-        // =============================================
+        // ============================================
+        const SENHA = 'admin123';
         const modalLogin = document.getElementById('modalLogin');
-        const senhaInput = document.getElementById('senhaLogin');
+        const senhaInput = document.getElementById('senha');
         const erroLogin = document.getElementById('erroLogin');
 
         function abrirLogin() {
-            modalLogin.classList.add('visivel');
+            modalLogin.classList.add('show');
             senhaInput.value = '';
-            erroLogin.classList.remove('visivel');
+            erroLogin.classList.remove('show');
             setTimeout(() => senhaInput.focus(), 200);
         }
 
-        function fecharLogin() {
-            modalLogin.classList.remove('visivel');
-        }
+        function fecharLogin() { modalLogin.classList.remove('show'); }
 
         function tentarLogin() {
-            if (senhaInput.value.trim() === SENHA_ADMIN) {
+            if (senhaInput.value.trim() === SENHA) {
                 fecharLogin();
-                ativarModo(true);
-                showToast('Modo Administrador ativado 🔓', 'success');
+                ativarAdmin(true);
+                toast('Modo Admin ativado 🔓');
             } else {
-                erroLogin.classList.add('visivel');
+                erroLogin.classList.add('show');
                 senhaInput.value = '';
                 senhaInput.focus();
-                showToast('Senha incorreta! ❌', 'error');
+                toast('Senha incorreta ❌', '❌');
             }
         }
 
@@ -1629,111 +1033,100 @@
         senhaInput.addEventListener('keypress', e => { if (e.key === 'Enter') tentarLogin(); });
         modalLogin.addEventListener('click', e => { if (e.target === modalLogin) fecharLogin(); });
 
-        // =============================================
+        // ============================================
         // MODAL NOVO CLIENTE
-        // =============================================
-        const modalNovo = document.getElementById('modalNovoCliente');
-        const btnNovoCliente = document.getElementById('btnNovoCliente');
+        // ============================================
+        const modalNovo = document.getElementById('modalNovo');
 
-        btnNovoCliente.addEventListener('click', () => {
+        document.getElementById('btnNovoCliente').addEventListener('click', () => {
             const hoje = new Date();
             const ano = hoje.getFullYear();
-            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-            const dia = String(hoje.getDate()).padStart(2, '0');
-            document.getElementById('novaDataInicial').value = `${ano}-${mes}-${dia}`;
-            document.getElementById('novoId').value = obterProximoId();
+            const mes = String(hoje.getMonth()+1).padStart(2,'0');
+            const dia = String(hoje.getDate()).padStart(2,'0');
+            document.getElementById('novaData').value = `${ano}-${mes}-${dia}`;
+            document.getElementById('novoId').value = proximoId();
             document.getElementById('novoValor').value = 600;
             document.getElementById('numParcelas').value = 4;
-            modalNovo.classList.add('visivel');
+            modalNovo.classList.add('show');
         });
 
-        document.getElementById('btnCancelarModal').addEventListener('click', () => modalNovo.classList.remove('visivel'));
-        document.getElementById('btnSalvarCliente').addEventListener('click', () => {
+        document.getElementById('btnCancelarNovo').addEventListener('click', () => modalNovo.classList.remove('show'));
+        document.getElementById('btnSalvarNovo').addEventListener('click', () => {
             const id = parseInt(document.getElementById('novoId').value);
-            const valor = parseFloat(document.getElementById('novoValor').value);
-            const dataInicial = document.getElementById('novaDataInicial').value;
-            const numParcelas = parseInt(document.getElementById('numParcelas').value);
+            const data = document.getElementById('novaData').value;
+            const qtd = parseInt(document.getElementById('numParcelas').value);
 
-            if (!id || isNaN(id) || id < 1) {
-                showToast('Número de cliente inválido! ❌', 'error');
-                return;
-            }
-            if (dados.clientes.some(c => c.id === id)) {
-                showToast(`Cliente ${id} já existe! ❌`, 'error');
-                return;
-            }
-            if (!dataInicial) {
-                showToast('Selecione a data da primeira parcela! ❌', 'error');
-                return;
-            }
-            if (!numParcelas || numParcelas < 1) {
-                showToast('Informe a quantidade de parcelas! ❌', 'error');
-                return;
-            }
+            if (!id || id < 1) { toast('Número inválido ❌', '❌'); return; }
+            if (clientesAtuais.some(c => c.id === id)) { toast(`Cliente ${id} já existe ❌`, '❌'); return; }
+            if (!data) { toast('Selecione a data ❌', '❌'); return; }
+            if (!qtd || qtd < 1) { toast('Número de parcelas inválido ❌', '❌'); return; }
 
-            adicionarCliente(id, valor, dataInicial, numParcelas);
-            modalNovo.classList.remove('visivel');
+            adicionarCliente(id, data, qtd);
+            modalNovo.classList.remove('show');
         });
-        modalNovo.addEventListener('click', e => { if (e.target === modalNovo) modalNovo.classList.remove('visivel'); });
+        modalNovo.addEventListener('click', e => { if (e.target === modalNovo) modalNovo.classList.remove('show'); });
 
-        // =============================================
-        // MODO ADMIN
-        // =============================================
-        const btnModoConvidado = document.getElementById('btnModoConvidado');
-        const btnModoAdmin = document.getElementById('btnModoAdmin');
-        const btnSairAdmin = document.getElementById('btnSairAdmin');
-        const modoAdminDiv = document.getElementById('modoAdmin');
+        // ============================================
+        // ADMIN
+        // ============================================
+        const btnConvidado = document.getElementById('btnModoConvidado');
+        const btnAdmin = document.getElementById('btnModoAdmin');
+        const btnSair = document.getElementById('btnSairAdmin');
+        const btnNovo = document.getElementById('btnNovoCliente');
+        const banner = document.getElementById('adminBanner');
 
-        function ativarModo(admin) {
-            modoAdmin = admin;
-            if (admin) {
-                btnModoAdmin.classList.add('ativo-admin');
-                btnModoConvidado.classList.remove('ativo');
-                modoAdminDiv.classList.add('visivel');
-                btnNovoCliente.style.display = 'inline-flex';
-                btnSairAdmin.style.display = 'inline-flex';
-                btnModoAdmin.style.display = 'none';
+        function ativarAdmin(ativo) {
+            modoAdmin = ativo;
+            if (ativo) {
+                btnAdmin.classList.add('admin-active');
+                btnConvidado.classList.remove('active');
+                banner.classList.add('show');
+                btnNovo.style.display = 'inline-flex';
+                btnSair.style.display = 'inline-flex';
+                btnAdmin.style.display = 'none';
             } else {
-                btnModoConvidado.classList.add('ativo');
-                btnModoAdmin.classList.remove('ativo-admin');
-                btnModoAdmin.style.display = 'inline-flex';
-                modoAdminDiv.classList.remove('visivel');
-                btnNovoCliente.style.display = 'none';
-                btnSairAdmin.style.display = 'none';
+                btnConvidado.classList.add('active');
+                btnAdmin.classList.remove('admin-active');
+                btnAdmin.style.display = 'inline-flex';
+                banner.classList.remove('show');
+                btnNovo.style.display = 'none';
+                btnSair.style.display = 'none';
             }
             renderizar();
         }
 
-        btnModoConvidado.addEventListener('click', () => {
+        btnConvidado.addEventListener('click', () => {
             if (modoAdmin && !confirm('Sair do modo admin?')) return;
-            if (modoAdmin) showToast('Modo Convidado ativado 👀', 'info');
-            ativarModo(false);
+            ativarAdmin(false);
+            toast('Modo Convidado 👤', '👤');
         });
 
-        btnModoAdmin.addEventListener('click', abrirLogin);
-        btnSairAdmin.addEventListener('click', () => {
+        btnAdmin.addEventListener('click', abrirLogin);
+        btnSair.addEventListener('click', () => {
             if (confirm('Sair do modo admin?')) {
-                ativarModo(false);
-                showToast('Modo Convidado ativado 👀', 'info');
+                ativarAdmin(false);
+                toast('Modo Convidado 👤', '👤');
             }
         });
 
-        // =============================================
+        // ============================================
         // FILTROS
-        // =============================================
-        document.querySelectorAll('.filtro-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('ativo'));
-                this.classList.add('ativo');
-                filtroAtual = this.dataset.filtro;
+        // ============================================
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            b.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active'));
+                this.classList.add('active');
+                filtro = this.dataset.filter;
                 renderizar();
             });
         });
 
-        // =============================================
-        // INICIALIZAÇÃO
-        // =============================================
-        ativarModo(false);
+        // ============================================
+        // INICIAR
+        // ============================================
+        // Inicia o listener em tempo real
+        iniciarListener();
+        ativarAdmin(false);
     </script>
 </body>
 </html>
