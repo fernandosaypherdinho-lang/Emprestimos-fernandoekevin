@@ -791,11 +791,11 @@
         // ESTADO
         // ============================================
         let clientesAtuais = [];
-        let modoAtual = 'convidado'; // 'convidado' | 'supervisor' | 'admin'
+        let modoAtual = 'convidado';
         let filtro = 'todos';
         let tema = localStorage.getItem('payflow-theme') || 'light';
         let carregando = true;
-        let modoSolicitado = null; // para saber qual modo está pedindo senha
+        let modoSolicitado = null;
 
         const LUCRO_POR_PARCELA = 50;
         const SENHA = 'admin123';
@@ -1125,7 +1125,7 @@
         }
 
         // ============================================
-        // MODAL LOGIN (UNIFICADO)
+        // MODAL LOGIN (UNIFICADO - CORRIGIDO)
         // ============================================
         const modalLogin = document.getElementById('modalLogin');
         const senhaInput = document.getElementById('senha');
@@ -1150,20 +1150,29 @@
 
         function fecharLogin() { 
             modalLogin.classList.remove('show');
-            modoSolicitado = null;
+            // Não limpa modoSolicitado aqui para evitar perder a referência
         }
 
         function tentarLogin() {
-            if (senhaInput.value.trim() === SENHA) {
+            const senhaDigitada = senhaInput.value.trim();
+            
+            if (senhaDigitada === SENHA) {
+                // Senha correta!
                 fecharLogin();
-                if (modoSolicitado === 'admin') {
-                    ativarModo('admin');
-                    toast('Modo Admin ativado 🔓');
-                } else if (modoSolicitado === 'supervisor') {
-                    ativarModo('supervisor');
-                    toast('Modo Supervisor ativado 👀');
-                }
+                
+                // Aguarda o modal fechar para então ativar o modo
+                setTimeout(() => {
+                    if (modoSolicitado === 'admin') {
+                        ativarModo('admin');
+                        toast('Modo Admin ativado 🔓');
+                    } else if (modoSolicitado === 'supervisor') {
+                        ativarModo('supervisor');
+                        toast('Modo Supervisor ativado 👀');
+                    }
+                    modoSolicitado = null;
+                }, 200);
             } else {
+                // Senha incorreta
                 erroLogin.classList.add('show');
                 senhaInput.value = '';
                 senhaInput.focus();
@@ -1172,9 +1181,23 @@
         }
 
         document.getElementById('btnConfirmarLogin').addEventListener('click', tentarLogin);
-        document.getElementById('btnCancelarLogin').addEventListener('click', fecharLogin);
-        senhaInput.addEventListener('keypress', e => { if (e.key === 'Enter') tentarLogin(); });
-        modalLogin.addEventListener('click', e => { if (e.target === modalLogin) fecharLogin(); });
+        document.getElementById('btnCancelarLogin').addEventListener('click', function() {
+            fecharLogin();
+            modoSolicitado = null;
+        });
+        
+        senhaInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                tentarLogin();
+            }
+        });
+        
+        modalLogin.addEventListener('click', function(e) {
+            if (e.target === modalLogin) {
+                fecharLogin();
+                modoSolicitado = null;
+            }
+        });
 
         // ============================================
         // MODAL NOVO CLIENTE
@@ -1244,7 +1267,7 @@
                 btnSair.style.display = 'none';
                 btnAdmin.style.display = 'inline-flex';
                 btnSupervisor.style.display = 'inline-flex';
-                toast('Modo Convidado 👤', '👤');
+                // Não mostra toast para não poluir
             } 
             else if (modo === 'supervisor') {
                 btnSupervisor.classList.add('supervisor-active');
@@ -1254,7 +1277,6 @@
                 btnNovo.style.display = 'none';
                 btnSair.style.display = 'none';
                 btnAdmin.style.display = 'inline-flex';
-                toast('Modo Supervisor 👀 - Visualizando lucro', '👀');
             } 
             else if (modo === 'admin') {
                 btnAdmin.classList.add('admin-active');
@@ -1264,43 +1286,45 @@
                 btnNovo.style.display = 'inline-flex';
                 btnSair.style.display = 'inline-flex';
                 btnAdmin.style.display = 'none';
-                toast('Modo Admin 🔓 - Edição liberada', '🔓');
             }
 
             renderizar();
         }
 
         // Botões de modo
-        btnConvidado.addEventListener('click', () => {
-            if (modoAtual === 'admin') {
-                if (!confirm('Sair do modo admin?')) return;
+        btnConvidado.addEventListener('click', function() {
+            if (modoAtual === 'admin' || modoAtual === 'supervisor') {
+                if (!confirm('Sair do modo atual e voltar para Convidado?')) return;
             }
             ativarModo('convidado');
+            toast('Modo Convidado 👤', '👤');
         });
 
-        btnSupervisor.addEventListener('click', () => {
-            if (modoAtual === 'admin') {
-                if (!confirm('Sair do modo admin?')) return;
-            }
-            // Se já estiver no supervisor, não pede senha de novo
+        btnSupervisor.addEventListener('click', function() {
+            // Se já estiver no supervisor, não faz nada
             if (modoAtual === 'supervisor') {
-                ativarModo('supervisor');
+                toast('Já está no modo Supervisor 👀', '👀');
                 return;
+            }
+            // Se estiver no admin, pergunta se quer sair
+            if (modoAtual === 'admin') {
+                if (!confirm('Sair do modo Admin e entrar no Supervisor?')) return;
             }
             // Pede senha para entrar no supervisor
             abrirLogin('supervisor');
         });
 
-        btnAdmin.addEventListener('click', () => {
-            // Se já estiver no admin, não pede senha de novo
+        btnAdmin.addEventListener('click', function() {
+            // Se já estiver no admin, não faz nada
             if (modoAtual === 'admin') {
-                ativarModo('admin');
+                toast('Já está no modo Admin 🔓', '🔓');
                 return;
             }
+            // Se estiver no supervisor, não precisa confirmar
             abrirLogin('admin');
         });
 
-        btnSair.addEventListener('click', () => {
+        btnSair.addEventListener('click', function() {
             if (confirm('Sair do modo admin?')) {
                 ativarModo('convidado');
                 toast('Modo Convidado 👤', '👤');
