@@ -210,6 +210,12 @@
             color: white;
         }
 
+        .btn-outline.supervisor-active {
+            background: linear-gradient(135deg, var(--success), #00B894);
+            border-color: transparent;
+            color: white;
+        }
+
         .btn-theme {
             width: 42px;
             height: 42px;
@@ -243,6 +249,22 @@
 
         .admin-banner.show { display: flex; }
 
+        .supervisor-banner {
+            display: none;
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 2px solid var(--success);
+            border-radius: 16px;
+            padding: 0.7rem 1.5rem;
+            margin-bottom: 2rem;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            animation: slideDown 0.5s var(--transition);
+        }
+
+        .supervisor-banner.show { display: flex; }
+
         @keyframes slideDown {
             from { opacity:0; transform:translateY(-16px); }
             to { opacity:1; transform:translateY(0); }
@@ -250,6 +272,17 @@
 
         .admin-badge {
             background: var(--warning);
+            color: white;
+            padding: 0.15rem 1rem;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .supervisor-badge {
+            background: var(--success);
             color: white;
             padding: 0.15rem 1rem;
             border-radius: 50px;
@@ -312,6 +345,16 @@
         .stat .number.green { color: var(--success); }
         .stat .number.orange { color: var(--warning); }
         .stat .number.purple { color: var(--primary); }
+        .stat .number.gold { color: #F9A825; }
+
+        .stat.lucro-card {
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            background: linear-gradient(135deg, var(--bg-card), rgba(255, 215, 0, 0.05));
+        }
+
+        .stat.lucro-card .label {
+            color: #F9A825;
+        }
 
         .filters {
             display: flex;
@@ -453,6 +496,7 @@
         .btn-parcela.pagar { background: rgba(0,201,167,0.12); color: var(--success); }
         .btn-parcela.desfazer { background: rgba(255,107,107,0.12); color: var(--danger); }
         .btn-parcela.excluir { background: rgba(255,107,107,0.08); color: var(--danger); }
+        .btn-parcela:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
 
         .toast {
             position: fixed;
@@ -621,6 +665,7 @@
             <div class="header-actions">
                 <button class="btn-theme" id="btnTheme">🌙</button>
                 <button class="btn btn-outline active" id="btnModoConvidado">👤 Convidado</button>
+                <button class="btn btn-outline" id="btnModoSupervisor">👀 Supervisor</button>
                 <button class="btn btn-outline" id="btnModoAdmin">🔒 Admin</button>
                 <button class="btn btn-primary" id="btnNovoCliente" style="display:none;">➕ Novo</button>
                 <button class="btn btn-danger" id="btnSairAdmin" style="display:none;">🚪 Sair</button>
@@ -642,12 +687,27 @@
             </div>
         </div>
 
+        <!-- SUPERVISOR BANNER -->
+        <div class="supervisor-banner" id="supervisorBanner">
+            <span class="supervisor-badge">👀 Supervisor</span>
+            <div class="admin-tag">
+                <span>📊 Visualizando</span>
+                <span>💰 Lucro estimado</span>
+                <span>🔒 Sem edição</span>
+            </div>
+        </div>
+
         <!-- STATS -->
         <div class="stats">
             <div class="stat"><span class="label">📊 Total Parcelas</span><div class="number purple" id="totalParcelas">0</div></div>
             <div class="stat"><span class="label">✅ Pagas</span><div class="number green" id="totalPagos">0</div></div>
             <div class="stat"><span class="label">⏳ Pendentes</span><div class="number orange" id="totalPendentes">0</div></div>
             <div class="stat"><span class="label">👤 Clientes</span><div class="number purple" id="totalClientes">0</div></div>
+            <!-- CARD DE LUCRO - SÓ APARECE PARA SUPERVISOR E ADMIN -->
+            <div class="stat lucro-card" id="cardLucro" style="display:none;">
+                <span class="label">💰 Lucro Estimado (30 dias)</span>
+                <div class="number gold" id="lucroEstimado">R$ 0,00</div>
+            </div>
         </div>
 
         <!-- FILTERS -->
@@ -704,7 +764,6 @@
     <script>
         // ============================================
         // 🔥 CONFIGURAÇÃO DO FIREBASE
-        // Seus dados que você me enviou!
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyDZ_YANKeSXOGjO8DXGj_xVOWYXPlyaERo",
@@ -725,10 +784,12 @@
         // ESTADO
         // ============================================
         let clientesAtuais = [];
-        let modoAdmin = false;
+        let modoAtual = 'convidado'; // 'convidado' | 'supervisor' | 'admin'
         let filtro = 'todos';
         let tema = localStorage.getItem('payflow-theme') || 'light';
         let carregando = true;
+
+        const LUCRO_POR_PARCELA = 50;
 
         // ============================================
         // TEMA
@@ -776,8 +837,50 @@
         });
 
         // ============================================
-        // 🔥 OUVINTE EM TEMPO REAL - O SEGREDO!
-        // Isso faz as atualizações aparecerem para todos
+        // 🔥 FUNÇÃO DE CÁLCULO DO LUCRO
+        // ============================================
+        function calcularLucroProximos30Dias() {
+            const hoje = new Date();
+            const daqui30Dias = new Date();
+            daqui30Dias.setDate(hoje.getDate() + 30);
+            
+            let totalParcelas = 0;
+            
+            clientesAtuais.forEach(cliente => {
+                cliente.parcelas.forEach((data, index) => {
+                    // Só considera se estiver pendente
+                    if (!cliente.pagas.includes(index)) {
+                        const [dia, mes] = data.split('/');
+                        const anoAtual = hoje.getFullYear();
+                        let dataParcela = new Date(anoAtual, parseInt(mes) - 1, parseInt(dia));
+                        
+                        // Se a data já passou no ano atual, considera ano que vem
+                        if (dataParcela < hoje && parseInt(mes) < hoje.getMonth() + 1) {
+                            dataParcela = new Date(anoAtual + 1, parseInt(mes) - 1, parseInt(dia));
+                        }
+                        
+                        // Verifica se está nos próximos 30 dias
+                        if (dataParcela >= hoje && dataParcela <= daqui30Dias) {
+                            totalParcelas++;
+                        }
+                    }
+                });
+            });
+            
+            return totalParcelas * LUCRO_POR_PARCELA;
+        }
+
+        // ============================================
+        // ATUALIZAR LUCRO NA TELA
+        // ============================================
+        function atualizarLucro() {
+            const lucro = calcularLucroProximos30Dias();
+            const el = document.getElementById('lucroEstimado');
+            el.textContent = 'R$ ' + lucro.toFixed(2).replace('.', ',');
+        }
+
+        // ============================================
+        // OUVINTE EM TEMPO REAL
         // ============================================
         function iniciarListener() {
             const clientesRef = database.ref('clientes');
@@ -787,7 +890,6 @@
                 carregando = false;
                 
                 if (dados) {
-                    // Converte o objeto do Firebase para array
                     clientesAtuais = Object.keys(dados).map(key => {
                         return {
                             id: dados[key].id,
@@ -798,11 +900,13 @@
                     });
                 } else {
                     clientesAtuais = [];
-                    // Se não tiver dados, cria os dados iniciais
                     criarDadosIniciais();
                 }
                 
                 renderizar();
+                if (modoAtual === 'supervisor' || modoAtual === 'admin') {
+                    atualizarLucro();
+                }
             }, function(error) {
                 console.error('Erro no listener:', error);
                 toast('Erro ao conectar com Firebase ❌', '❌');
@@ -812,7 +916,7 @@
         }
 
         // ============================================
-        // CRIAR DADOS INICIAIS NO FIREBASE
+        // CRIAR DADOS INICIAIS
         // ============================================
         function criarDadosIniciais() {
             const dadosIniciais = [
@@ -834,6 +938,17 @@
             });
 
             toast('📦 Dados iniciais criados no Firebase!', '📦');
+        }
+
+        // ============================================
+        // CONTROLE DE PERMISSÕES
+        // ============================================
+        function podeEditar() {
+            return modoAtual === 'admin';
+        }
+
+        function podeVerLucro() {
+            return modoAtual === 'supervisor' || modoAtual === 'admin';
         }
 
         // ============================================
@@ -878,7 +993,7 @@
                     const statusText = pago ? '✅ Pago' : '⏳ Pendente';
 
                     let acao = '';
-                    if (modoAdmin) {
+                    if (podeEditar()) {
                         if (pago) {
                             acao = `<button class="btn-parcela desfazer" data-key="${cliente._firebaseKey}" data-index="${i}">↩️</button>`;
                         } else {
@@ -899,7 +1014,7 @@
                 });
 
                 let adminActions = '';
-                if (modoAdmin) {
+                if (podeEditar()) {
                     adminActions = `<button class="btn-parcela excluir" data-key="${cliente._firebaseKey}">🗑️</button>`;
                 }
 
@@ -919,59 +1034,65 @@
             document.getElementById('totalPendentes').textContent = totalPendentes;
             document.getElementById('totalClientes').textContent = lista.length;
 
-            // Eventos dos botões
-            document.querySelectorAll('.btn-parcela.pagar').forEach(b => {
-                b.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const key = b.dataset.key;
-                    const idx = parseInt(b.dataset.index);
-                    const cliente = clientesAtuais.find(c => c._firebaseKey === key);
-                    if (!cliente) return;
-                    if (!cliente.pagas) cliente.pagas = [];
-                    if (!cliente.pagas.includes(idx)) {
-                        cliente.pagas.push(idx);
-                        cliente.pagas.sort((a,b) => a-b);
-                        // Salva no Firebase
-                        database.ref('clientes/' + key + '/pagas').set(cliente.pagas);
-                        toast(`Parcela ${idx+1} do cliente ${cliente.id} paga ✅`);
-                    }
+            // Eventos dos botões (só se for Admin)
+            if (podeEditar()) {
+                document.querySelectorAll('.btn-parcela.pagar').forEach(b => {
+                    b.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const key = b.dataset.key;
+                        const idx = parseInt(b.dataset.index);
+                        const cliente = clientesAtuais.find(c => c._firebaseKey === key);
+                        if (!cliente) return;
+                        if (!cliente.pagas) cliente.pagas = [];
+                        if (!cliente.pagas.includes(idx)) {
+                            cliente.pagas.push(idx);
+                            cliente.pagas.sort((a,b) => a-b);
+                            database.ref('clientes/' + key + '/pagas').set(cliente.pagas);
+                            toast(`Parcela ${idx+1} do cliente ${cliente.id} paga ✅`);
+                        }
+                    });
                 });
-            });
 
-            document.querySelectorAll('.btn-parcela.desfazer').forEach(b => {
-                b.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const key = b.dataset.key;
-                    const idx = parseInt(b.dataset.index);
-                    const cliente = clientesAtuais.find(c => c._firebaseKey === key);
-                    if (!cliente) return;
-                    if (!cliente.pagas) cliente.pagas = [];
-                    if (cliente.pagas.includes(idx)) {
-                        cliente.pagas = cliente.pagas.filter(i => i !== idx);
-                        database.ref('clientes/' + key + '/pagas').set(cliente.pagas);
-                        toast(`Parcela ${idx+1} do cliente ${cliente.id} pendente ↩️`, '↩️');
-                    }
+                document.querySelectorAll('.btn-parcela.desfazer').forEach(b => {
+                    b.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const key = b.dataset.key;
+                        const idx = parseInt(b.dataset.index);
+                        const cliente = clientesAtuais.find(c => c._firebaseKey === key);
+                        if (!cliente) return;
+                        if (!cliente.pagas) cliente.pagas = [];
+                        if (cliente.pagas.includes(idx)) {
+                            cliente.pagas = cliente.pagas.filter(i => i !== idx);
+                            database.ref('clientes/' + key + '/pagas').set(cliente.pagas);
+                            toast(`Parcela ${idx+1} do cliente ${cliente.id} pendente ↩️`, '↩️');
+                        }
+                    });
                 });
-            });
 
-            document.querySelectorAll('.btn-parcela.excluir').forEach(b => {
-                b.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const key = b.dataset.key;
-                    const cliente = clientesAtuais.find(c => c._firebaseKey === key);
-                    if (!cliente) return;
-                    if (confirm(`Excluir Cliente ${cliente.id}?`)) {
-                        database.ref('clientes/' + key).remove();
-                        toast(`Cliente ${cliente.id} removido 🗑️`, '🗑️');
-                    }
+                document.querySelectorAll('.btn-parcela.excluir').forEach(b => {
+                    b.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const key = b.dataset.key;
+                        const cliente = clientesAtuais.find(c => c._firebaseKey === key);
+                        if (!cliente) return;
+                        if (confirm(`Excluir Cliente ${cliente.id}?`)) {
+                            database.ref('clientes/' + key).remove();
+                            toast(`Cliente ${cliente.id} removido 🗑️`, '🗑️');
+                        }
+                    });
                 });
-            });
+            }
         }
 
         // ============================================
-        // ADICIONAR CLIENTE
+        // ADICIONAR CLIENTE (só Admin)
         // ============================================
         function adicionarCliente(id, dataInicial, qtd) {
+            if (!podeEditar()) {
+                toast('Apenas Admin pode adicionar clientes ❌', '❌');
+                return;
+            }
+
             const datas = [];
             const d = new Date(dataInicial);
             for (let i=0; i<qtd; i++) {
@@ -1018,7 +1139,7 @@
         function tentarLogin() {
             if (senhaInput.value.trim() === SENHA) {
                 fecharLogin();
-                ativarAdmin(true);
+                ativarModo('admin');
                 toast('Modo Admin ativado 🔓');
             } else {
                 erroLogin.classList.add('show');
@@ -1039,6 +1160,10 @@
         const modalNovo = document.getElementById('modalNovo');
 
         document.getElementById('btnNovoCliente').addEventListener('click', () => {
+            if (!podeEditar()) {
+                toast('Apenas Admin pode adicionar clientes ❌', '❌');
+                return;
+            }
             const hoje = new Date();
             const ano = hoje.getFullYear();
             const mes = String(hoje.getMonth()+1).padStart(2,'0');
@@ -1067,44 +1192,93 @@
         modalNovo.addEventListener('click', e => { if (e.target === modalNovo) modalNovo.classList.remove('show'); });
 
         // ============================================
-        // ADMIN
+        // MODO - 3 NÍVEIS
         // ============================================
         const btnConvidado = document.getElementById('btnModoConvidado');
+        const btnSupervisor = document.getElementById('btnModoSupervisor');
         const btnAdmin = document.getElementById('btnModoAdmin');
         const btnSair = document.getElementById('btnSairAdmin');
         const btnNovo = document.getElementById('btnNovoCliente');
-        const banner = document.getElementById('adminBanner');
+        const bannerAdmin = document.getElementById('adminBanner');
+        const bannerSupervisor = document.getElementById('supervisorBanner');
+        const cardLucro = document.getElementById('cardLucro');
 
-        function ativarAdmin(ativo) {
-            modoAdmin = ativo;
-            if (ativo) {
+        function ativarModo(modo) {
+            // Se for admin, verifica se já está logado
+            if (modo === 'admin' && !sessionStorage.getItem('admin_logado')) {
+                abrirLogin();
+                return;
+            }
+
+            modoAtual = modo;
+
+            // Reset todos os botões
+            [btnConvidado, btnSupervisor, btnAdmin].forEach(b => {
+                b.classList.remove('active', 'admin-active', 'supervisor-active');
+            });
+
+            // Reset banners
+            bannerAdmin.classList.remove('show');
+            bannerSupervisor.classList.remove('show');
+
+            if (modo === 'convidado') {
+                btnConvidado.classList.add('active');
+                bannerSupervisor.classList.remove('show');
+                bannerAdmin.classList.remove('show');
+                cardLucro.style.display = 'none';
+                btnNovo.style.display = 'none';
+                btnSair.style.display = 'none';
+                btnAdmin.style.display = 'inline-flex';
+                toast('Modo Convidado 👤', '👤');
+            } 
+            else if (modo === 'supervisor') {
+                btnSupervisor.classList.add('supervisor-active');
+                bannerSupervisor.classList.add('show');
+                cardLucro.style.display = 'block';
+                atualizarLucro();
+                btnNovo.style.display = 'none';
+                btnSair.style.display = 'none';
+                btnAdmin.style.display = 'inline-flex';
+                toast('Modo Supervisor 👀 - Visualizando lucro', '👀');
+            } 
+            else if (modo === 'admin') {
                 btnAdmin.classList.add('admin-active');
-                btnConvidado.classList.remove('active');
-                banner.classList.add('show');
+                bannerAdmin.classList.add('show');
+                cardLucro.style.display = 'block';
+                atualizarLucro();
                 btnNovo.style.display = 'inline-flex';
                 btnSair.style.display = 'inline-flex';
                 btnAdmin.style.display = 'none';
-            } else {
-                btnConvidado.classList.add('active');
-                btnAdmin.classList.remove('admin-active');
-                btnAdmin.style.display = 'inline-flex';
-                banner.classList.remove('show');
-                btnNovo.style.display = 'none';
-                btnSair.style.display = 'none';
+                toast('Modo Admin 🔓 - Edição liberada', '🔓');
             }
+
             renderizar();
         }
 
+        // Botões de modo
         btnConvidado.addEventListener('click', () => {
-            if (modoAdmin && !confirm('Sair do modo admin?')) return;
-            ativarAdmin(false);
-            toast('Modo Convidado 👤', '👤');
+            if (modoAtual === 'admin') {
+                sessionStorage.removeItem('admin_logado');
+            }
+            ativarModo('convidado');
         });
 
-        btnAdmin.addEventListener('click', abrirLogin);
+        btnSupervisor.addEventListener('click', () => {
+            if (modoAtual === 'admin') {
+                sessionStorage.removeItem('admin_logado');
+            }
+            ativarModo('supervisor');
+        });
+
+        btnAdmin.addEventListener('click', () => {
+            // Tenta logar
+            abrirLogin();
+        });
+
         btnSair.addEventListener('click', () => {
             if (confirm('Sair do modo admin?')) {
-                ativarAdmin(false);
+                sessionStorage.removeItem('admin_logado');
+                ativarModo('convidado');
                 toast('Modo Convidado 👤', '👤');
             }
         });
@@ -1124,9 +1298,9 @@
         // ============================================
         // INICIAR
         // ============================================
-        // Inicia o listener em tempo real
         iniciarListener();
-        ativarAdmin(false);
+        // Começa no modo convidado
+        ativarModo('convidado');
     </script>
 </body>
 </html>
