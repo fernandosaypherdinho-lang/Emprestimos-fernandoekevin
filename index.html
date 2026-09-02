@@ -562,7 +562,14 @@
             to { opacity:1; transform:translateY(0) scale(1); }
         }
 
-        .modal-box h2 { font-size:1.4rem; font-weight:800; margin-bottom:0.2rem; }
+        .modal-box h2 { 
+            font-size:1.4rem; 
+            font-weight:800; 
+            margin-bottom:0.2rem; 
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
         .modal-box .sub { color:var(--text-secondary); margin-bottom:1.2rem; font-size:0.9rem; }
 
         .modal-box label { display:block; font-weight:700; font-size:0.8rem; margin-bottom:0.2rem; }
@@ -726,11 +733,11 @@
     <!-- TOAST -->
     <div class="toast" id="toast"><span class="icon">✅</span><span class="msg" id="toastMsg">Sucesso!</span></div>
 
-    <!-- MODAL LOGIN -->
+    <!-- MODAL LOGIN (UNIFICADO) -->
     <div class="modal" id="modalLogin">
         <div class="modal-box">
-            <h2>🔒 Acesso Admin</h2>
-            <p class="sub">Digite a senha para ativar o modo administrador</p>
+            <h2 id="modalTitulo">🔒 Acesso</h2>
+            <p class="sub" id="modalSub">Digite a senha para acessar este modo</p>
             <label for="senha">Senha:</label>
             <input type="password" id="senha" placeholder="Digite a senha" />
             <div class="error" id="erroLogin">❌ Senha incorreta</div>
@@ -788,8 +795,10 @@
         let filtro = 'todos';
         let tema = localStorage.getItem('payflow-theme') || 'light';
         let carregando = true;
+        let modoSolicitado = null; // para saber qual modo está pedindo senha
 
         const LUCRO_POR_PARCELA = 50;
+        const SENHA = 'admin123';
 
         // ============================================
         // TEMA
@@ -848,18 +857,15 @@
             
             clientesAtuais.forEach(cliente => {
                 cliente.parcelas.forEach((data, index) => {
-                    // Só considera se estiver pendente
                     if (!cliente.pagas.includes(index)) {
                         const [dia, mes] = data.split('/');
                         const anoAtual = hoje.getFullYear();
                         let dataParcela = new Date(anoAtual, parseInt(mes) - 1, parseInt(dia));
                         
-                        // Se a data já passou no ano atual, considera ano que vem
                         if (dataParcela < hoje && parseInt(mes) < hoje.getMonth() + 1) {
                             dataParcela = new Date(anoAtual + 1, parseInt(mes) - 1, parseInt(dia));
                         }
                         
-                        // Verifica se está nos próximos 30 dias
                         if (dataParcela >= hoje && dataParcela <= daqui30Dias) {
                             totalParcelas++;
                         }
@@ -1034,7 +1040,6 @@
             document.getElementById('totalPendentes').textContent = totalPendentes;
             document.getElementById('totalClientes').textContent = lista.length;
 
-            // Eventos dos botões (só se for Admin)
             if (podeEditar()) {
                 document.querySelectorAll('.btn-parcela.pagar').forEach(b => {
                     b.addEventListener('click', (e) => {
@@ -1120,27 +1125,44 @@
         }
 
         // ============================================
-        // MODAL LOGIN
+        // MODAL LOGIN (UNIFICADO)
         // ============================================
-        const SENHA = 'admin123';
         const modalLogin = document.getElementById('modalLogin');
         const senhaInput = document.getElementById('senha');
         const erroLogin = document.getElementById('erroLogin');
+        const modalTitulo = document.getElementById('modalTitulo');
+        const modalSub = document.getElementById('modalSub');
 
-        function abrirLogin() {
+        function abrirLogin(modo) {
+            modoSolicitado = modo;
+            if (modo === 'admin') {
+                modalTitulo.textContent = '🔒 Acesso Admin';
+                modalSub.textContent = 'Digite a senha para ativar o modo administrador';
+            } else if (modo === 'supervisor') {
+                modalTitulo.textContent = '👀 Acesso Supervisor';
+                modalSub.textContent = 'Digite a senha para ativar o modo supervisor (visualização + lucro)';
+            }
             modalLogin.classList.add('show');
             senhaInput.value = '';
             erroLogin.classList.remove('show');
             setTimeout(() => senhaInput.focus(), 200);
         }
 
-        function fecharLogin() { modalLogin.classList.remove('show'); }
+        function fecharLogin() { 
+            modalLogin.classList.remove('show');
+            modoSolicitado = null;
+        }
 
         function tentarLogin() {
             if (senhaInput.value.trim() === SENHA) {
                 fecharLogin();
-                ativarModo('admin');
-                toast('Modo Admin ativado 🔓');
+                if (modoSolicitado === 'admin') {
+                    ativarModo('admin');
+                    toast('Modo Admin ativado 🔓');
+                } else if (modoSolicitado === 'supervisor') {
+                    ativarModo('supervisor');
+                    toast('Modo Supervisor ativado 👀');
+                }
             } else {
                 erroLogin.classList.add('show');
                 senhaInput.value = '';
@@ -1192,7 +1214,7 @@
         modalNovo.addEventListener('click', e => { if (e.target === modalNovo) modalNovo.classList.remove('show'); });
 
         // ============================================
-        // MODO - 3 NÍVEIS
+        // MODO - 3 NÍVEIS (COM SENHA NO SUPERVISOR)
         // ============================================
         const btnConvidado = document.getElementById('btnModoConvidado');
         const btnSupervisor = document.getElementById('btnModoSupervisor');
@@ -1204,12 +1226,6 @@
         const cardLucro = document.getElementById('cardLucro');
 
         function ativarModo(modo) {
-            // Se for admin, verifica se já está logado
-            if (modo === 'admin' && !sessionStorage.getItem('admin_logado')) {
-                abrirLogin();
-                return;
-            }
-
             modoAtual = modo;
 
             // Reset todos os botões
@@ -1223,12 +1239,11 @@
 
             if (modo === 'convidado') {
                 btnConvidado.classList.add('active');
-                bannerSupervisor.classList.remove('show');
-                bannerAdmin.classList.remove('show');
                 cardLucro.style.display = 'none';
                 btnNovo.style.display = 'none';
                 btnSair.style.display = 'none';
                 btnAdmin.style.display = 'inline-flex';
+                btnSupervisor.style.display = 'inline-flex';
                 toast('Modo Convidado 👤', '👤');
             } 
             else if (modo === 'supervisor') {
@@ -1258,26 +1273,35 @@
         // Botões de modo
         btnConvidado.addEventListener('click', () => {
             if (modoAtual === 'admin') {
-                sessionStorage.removeItem('admin_logado');
+                if (!confirm('Sair do modo admin?')) return;
             }
             ativarModo('convidado');
         });
 
         btnSupervisor.addEventListener('click', () => {
             if (modoAtual === 'admin') {
-                sessionStorage.removeItem('admin_logado');
+                if (!confirm('Sair do modo admin?')) return;
             }
-            ativarModo('supervisor');
+            // Se já estiver no supervisor, não pede senha de novo
+            if (modoAtual === 'supervisor') {
+                ativarModo('supervisor');
+                return;
+            }
+            // Pede senha para entrar no supervisor
+            abrirLogin('supervisor');
         });
 
         btnAdmin.addEventListener('click', () => {
-            // Tenta logar
-            abrirLogin();
+            // Se já estiver no admin, não pede senha de novo
+            if (modoAtual === 'admin') {
+                ativarModo('admin');
+                return;
+            }
+            abrirLogin('admin');
         });
 
         btnSair.addEventListener('click', () => {
             if (confirm('Sair do modo admin?')) {
-                sessionStorage.removeItem('admin_logado');
                 ativarModo('convidado');
                 toast('Modo Convidado 👤', '👤');
             }
@@ -1299,7 +1323,6 @@
         // INICIAR
         // ============================================
         iniciarListener();
-        // Começa no modo convidado
         ativarModo('convidado');
     </script>
 </body>
