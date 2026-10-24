@@ -6,9 +6,10 @@
     <title>Fernando e Kevin — Gestão Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- 🔥 FIREBASE - Tag Script (funciona no GitHub Pages) -->
+    <!-- 🔥 FIREBASE - Tag Script -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <style>
         /* ========== VARIÁVEIS ========== */
@@ -82,10 +83,154 @@
 
         .container { max-width: 1400px; margin:0 auto; position:relative; z-index:1; }
 
+        /* ========== TELA DE LOGIN ========== */
+        #telaLogin {
+            display: flex;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .login-box {
+            background: var(--bg-card);
+            backdrop-filter: blur(24px);
+            border-radius: var(--radius);
+            padding: 3rem 2.5rem;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--glass);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+            background-size: 300% 100%;
+            animation: gradientMove 6s ease-in-out infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 0%; }
+            50% { background-position: 100% 0%; }
+        }
+
+        .login-box .logo-icon {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 16px rgba(108,99,255,0.25);
+        }
+
+        .login-box h2 {
+            font-size: 1.6rem;
+            font-weight: 900;
+            margin-bottom: 0.2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-box .sub {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .login-box label {
+            display: block;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-align: left;
+            margin-bottom: 0.3rem;
+            color: var(--text-secondary);
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            font-family: var(--font);
+            font-size: 1rem;
+            background: var(--bg);
+            color: var(--text);
+            margin-bottom: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(108,99,255,0.08);
+        }
+
+        .login-box .btn-login {
+            width: 100%;
+            padding: 0.9rem;
+            border: none;
+            border-radius: 14px;
+            font-family: var(--font);
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 20px rgba(108,99,255,0.25);
+            transition: all var(--transition);
+        }
+
+        .login-box .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(108,99,255,0.35);
+        }
+
+        .login-box .erro-login {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            display: none;
+            background: rgba(255,107,107,0.08);
+            padding: 0.6rem;
+            border-radius: 10px;
+        }
+
+        .login-box .erro-login.show { display: block; }
+
+        .login-box .loading-login {
+            display: none;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .login-box .loading-login.show { display: block; }
+
+        /* ========== SITE (ESCONDIDO INICIALMENTE) ========== */
+        #siteCompleto {
+            display: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ========== HEADER ========== */
         .header {
             background: var(--bg-card);
             backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
             border-radius: var(--radius);
             padding: 1.2rem 2rem;
             margin-bottom: 2rem;
@@ -108,11 +253,6 @@
             background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--primary));
             background-size: 300% 100%;
             animation: gradientMove 6s ease-in-out infinite;
-        }
-
-        @keyframes gradientMove {
-            0%, 100% { background-position: 0% 0%; }
-            50% { background-position: 100% 0%; }
         }
 
         .logo {
@@ -606,6 +746,7 @@
             .grid { grid-template-columns:1fr; }
             .modal-box { padding:1.5rem; margin:1rem; }
             .toast { bottom:1rem; right:1rem; left:1rem; max-width:none; }
+            .login-box { padding: 2rem 1.5rem; }
         }
 
         @media (max-width: 480px) {
@@ -658,82 +799,105 @@
 </head>
 <body>
     <div class="bg-glow"></div>
-    <div class="container">
 
-        <!-- HEADER -->
-        <header class="header">
-            <div class="logo">
-                <div class="logo-icon">💰</div>
-                <div>
-                    <h1>Fernando e Kevin Pro</h1>
-                    <span>Gestão de Pagamentos • Premium</span>
+    <!-- ================= TELA DE LOGIN ================= -->
+    <div id="telaLogin">
+        <div class="login-box">
+            <div class="logo-icon">💰</div>
+            <h2>Fernando e Kevin Pro</h2>
+            <p class="sub">Acesso restrito ao sistema</p>
+
+            <label for="loginEmail">E-mail:</label>
+            <input type="email" id="loginEmail" placeholder="seu@email.com" />
+
+            <label for="loginSenha">Senha:</label>
+            <input type="password" id="loginSenha" placeholder="Sua senha" />
+
+            <div class="erro-login" id="erroLoginAuth">❌ E-mail ou senha incorretos</div>
+            <div class="loading-login" id="loadingLogin">🔄 Entrando...</div>
+
+            <button class="btn-login" id="btnFazerLogin">Entrar no Sistema</button>
+        </div>
+    </div>
+
+    <!-- ================= SITE COMPLETO ================= -->
+    <div id="siteCompleto">
+        <div class="container">
+
+            <!-- HEADER -->
+            <header class="header">
+                <div class="logo">
+                    <div class="logo-icon">💰</div>
+                    <div>
+                        <h1>Fernando e Kevin Pro</h1>
+                        <span>Gestão de Pagamentos • Premium</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-theme" id="btnTheme">🌙</button>
+                    <button class="btn btn-outline active" id="btnModoConvidado">👤 Convidado</button>
+                    <button class="btn btn-outline" id="btnModoSupervisor">👀 Supervisor</button>
+                    <button class="btn btn-outline" id="btnModoAdmin">🔒 Admin</button>
+                    <button class="btn btn-primary" id="btnNovoCliente" style="display:none;">➕ Novo</button>
+                    <button class="btn btn-danger" id="btnSairAdmin" style="display:none;">🚪 Sair</button>
+                    <span class="sync-status" id="syncStatus">
+                        <span class="dot online" id="statusDot"></span>
+                        <span id="statusText">Online</span>
+                    </span>
+                </div>
+            </header>
+
+            <!-- ADMIN BANNER -->
+            <div class="admin-banner" id="adminBanner">
+                <span class="admin-badge">🔑 Admin</span>
+                <div class="admin-tag">
+                    <span>✅ Pagar</span>
+                    <span>↩️ Desfazer</span>
+                    <span>➕ Adicionar</span>
+                    <span>🗑️ Excluir</span>
                 </div>
             </div>
-            <div class="header-actions">
-                <button class="btn-theme" id="btnTheme">🌙</button>
-                <button class="btn btn-outline active" id="btnModoConvidado">👤 Convidado</button>
-                <button class="btn btn-outline" id="btnModoSupervisor">👀 Supervisor</button>
-                <button class="btn btn-outline" id="btnModoAdmin">🔒 Admin</button>
-                <button class="btn btn-primary" id="btnNovoCliente" style="display:none;">➕ Novo</button>
-                <button class="btn btn-danger" id="btnSairAdmin" style="display:none;">🚪 Sair</button>
-                <span class="sync-status" id="syncStatus">
-                    <span class="dot online" id="statusDot"></span>
-                    <span id="statusText">Online</span>
-                </span>
+
+            <!-- SUPERVISOR BANNER -->
+            <div class="supervisor-banner" id="supervisorBanner">
+                <span class="supervisor-badge">👀 Supervisor</span>
+                <div class="admin-tag">
+                    <span>📊 Visualizando</span>
+                    <span>💰 Lucro estimado</span>
+                    <span>🔒 Sem edição</span>
+                </div>
             </div>
-        </header>
 
-        <!-- ADMIN BANNER -->
-        <div class="admin-banner" id="adminBanner">
-            <span class="admin-badge">🔑 Admin</span>
-            <div class="admin-tag">
-                <span>✅ Pagar</span>
-                <span>↩️ Desfazer</span>
-                <span>➕ Adicionar</span>
-                <span>🗑️ Excluir</span>
+            <!-- STATS -->
+            <div class="stats">
+                <div class="stat"><span class="label">📊 Total Parcelas</span><div class="number purple" id="totalParcelas">0</div></div>
+                <div class="stat"><span class="label">✅ Pagas</span><div class="number green" id="totalPagos">0</div></div>
+                <div class="stat"><span class="label">⏳ Pendentes</span><div class="number orange" id="totalPendentes">0</div></div>
+                <div class="stat"><span class="label">👤 Clientes</span><div class="number purple" id="totalClientes">0</div></div>
+                <div class="stat lucro-card" id="cardLucro" style="display:none;">
+                    <span class="label">💰 Lucro Estimado (30 dias)</span>
+                    <div class="number gold" id="lucroEstimado">R$ 0,00</div>
+                </div>
             </div>
-        </div>
 
-        <!-- SUPERVISOR BANNER -->
-        <div class="supervisor-banner" id="supervisorBanner">
-            <span class="supervisor-badge">👀 Supervisor</span>
-            <div class="admin-tag">
-                <span>📊 Visualizando</span>
-                <span>💰 Lucro estimado</span>
-                <span>🔒 Sem edição</span>
+            <!-- FILTERS -->
+            <div class="filters">
+                <button class="filter-btn active" data-filter="todos">📋 Todos</button>
+                <button class="filter-btn" data-filter="pagos">✅ Pagos</button>
+                <button class="filter-btn" data-filter="pendentes">⏳ Pendentes</button>
             </div>
-        </div>
 
-        <!-- STATS -->
-        <div class="stats">
-            <div class="stat"><span class="label">📊 Total Parcelas</span><div class="number purple" id="totalParcelas">0</div></div>
-            <div class="stat"><span class="label">✅ Pagas</span><div class="number green" id="totalPagos">0</div></div>
-            <div class="stat"><span class="label">⏳ Pendentes</span><div class="number orange" id="totalPendentes">0</div></div>
-            <div class="stat"><span class="label">👤 Clientes</span><div class="number purple" id="totalClientes">0</div></div>
-            <!-- CARD DE LUCRO - SÓ APARECE PARA SUPERVISOR E ADMIN -->
-            <div class="stat lucro-card" id="cardLucro" style="display:none;">
-                <span class="label">💰 Lucro Estimado (30 dias)</span>
-                <div class="number gold" id="lucroEstimado">R$ 0,00</div>
+            <!-- GRID -->
+            <div class="grid" id="grid">
+                <div class="loading">🔄 Carregando dados do Firebase...</div>
             </div>
-        </div>
-
-        <!-- FILTERS -->
-        <div class="filters">
-            <button class="filter-btn active" data-filter="todos">📋 Todos</button>
-            <button class="filter-btn" data-filter="pagos">✅ Pagos</button>
-            <button class="filter-btn" data-filter="pendentes">⏳ Pendentes</button>
-        </div>
-
-        <!-- GRID -->
-        <div class="grid" id="grid">
-            <div class="loading">🔄 Carregando dados do Firebase...</div>
         </div>
     </div>
 
     <!-- TOAST -->
     <div class="toast" id="toast"><span class="icon">✅</span><span class="msg" id="toastMsg">Sucesso!</span></div>
 
-    <!-- MODAL LOGIN (UNIFICADO) -->
+    <!-- MODAL LOGIN -->
     <div class="modal" id="modalLogin">
         <div class="modal-box">
             <h2 id="modalTitulo">🔒 Acesso</h2>
@@ -786,6 +950,7 @@
         // ============================================
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        const auth = firebase.auth();
 
         // ============================================
         // ESTADO
@@ -876,9 +1041,6 @@
             return totalParcelas * LUCRO_POR_PARCELA;
         }
 
-        // ============================================
-        // ATUALIZAR LUCRO NA TELA
-        // ============================================
         function atualizarLucro() {
             const lucro = calcularLucroProximos30Dias();
             const el = document.getElementById('lucroEstimado');
@@ -886,9 +1048,14 @@
         }
 
         // ============================================
-        // OUVINTE EM TEMPO REAL
+        // OUVINTE EM TEMPO REAL (só roda após login)
         // ============================================
+        let listenerIniciado = false;
+
         function iniciarListener() {
+            if (listenerIniciado) return;
+            listenerIniciado = true;
+
             const clientesRef = database.ref('clientes');
             
             clientesRef.on('value', function(snapshot) {
@@ -951,10 +1118,6 @@
         // ============================================
         function podeEditar() {
             return modoAtual === 'admin';
-        }
-
-        function podeVerLucro() {
-            return modoAtual === 'supervisor' || modoAtual === 'admin';
         }
 
         // ============================================
@@ -1090,7 +1253,7 @@
         }
 
         // ============================================
-        // ADICIONAR CLIENTE (só Admin)
+        // ADICIONAR CLIENTE
         // ============================================
         function adicionarCliente(id, dataInicial, qtd) {
             if (!podeEditar()) {
@@ -1125,7 +1288,7 @@
         }
 
         // ============================================
-        // MODAL LOGIN (UNIFICADO - CORRIGIDO)
+        // MODAL LOGIN (MODO ADMIN/SUPERVISOR)
         // ============================================
         const modalLogin = document.getElementById('modalLogin');
         const senhaInput = document.getElementById('senha');
@@ -1150,17 +1313,13 @@
 
         function fecharLogin() { 
             modalLogin.classList.remove('show');
-            // Não limpa modoSolicitado aqui para evitar perder a referência
         }
 
         function tentarLogin() {
             const senhaDigitada = senhaInput.value.trim();
             
             if (senhaDigitada === SENHA) {
-                // Senha correta!
                 fecharLogin();
-                
-                // Aguarda o modal fechar para então ativar o modo
                 setTimeout(() => {
                     if (modoSolicitado === 'admin') {
                         ativarModo('admin');
@@ -1172,7 +1331,6 @@
                     modoSolicitado = null;
                 }, 200);
             } else {
-                // Senha incorreta
                 erroLogin.classList.add('show');
                 senhaInput.value = '';
                 senhaInput.focus();
@@ -1187,9 +1345,7 @@
         });
         
         senhaInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                tentarLogin();
-            }
+            if (e.key === 'Enter') tentarLogin();
         });
         
         modalLogin.addEventListener('click', function(e) {
@@ -1237,7 +1393,7 @@
         modalNovo.addEventListener('click', e => { if (e.target === modalNovo) modalNovo.classList.remove('show'); });
 
         // ============================================
-        // MODO - 3 NÍVEIS (COM SENHA NO SUPERVISOR)
+        // MODO - 3 NÍVEIS
         // ============================================
         const btnConvidado = document.getElementById('btnModoConvidado');
         const btnSupervisor = document.getElementById('btnModoSupervisor');
@@ -1251,12 +1407,10 @@
         function ativarModo(modo) {
             modoAtual = modo;
 
-            // Reset todos os botões
             [btnConvidado, btnSupervisor, btnAdmin].forEach(b => {
                 b.classList.remove('active', 'admin-active', 'supervisor-active');
             });
 
-            // Reset banners
             bannerAdmin.classList.remove('show');
             bannerSupervisor.classList.remove('show');
 
@@ -1267,7 +1421,6 @@
                 btnSair.style.display = 'none';
                 btnAdmin.style.display = 'inline-flex';
                 btnSupervisor.style.display = 'inline-flex';
-                // Não mostra toast para não poluir
             } 
             else if (modo === 'supervisor') {
                 btnSupervisor.classList.add('supervisor-active');
@@ -1291,7 +1444,6 @@
             renderizar();
         }
 
-        // Botões de modo
         btnConvidado.addEventListener('click', function() {
             if (modoAtual === 'admin' || modoAtual === 'supervisor') {
                 if (!confirm('Sair do modo atual e voltar para Convidado?')) return;
@@ -1301,26 +1453,21 @@
         });
 
         btnSupervisor.addEventListener('click', function() {
-            // Se já estiver no supervisor, não faz nada
             if (modoAtual === 'supervisor') {
                 toast('Já está no modo Supervisor 👀', '👀');
                 return;
             }
-            // Se estiver no admin, pergunta se quer sair
             if (modoAtual === 'admin') {
                 if (!confirm('Sair do modo Admin e entrar no Supervisor?')) return;
             }
-            // Pede senha para entrar no supervisor
             abrirLogin('supervisor');
         });
 
         btnAdmin.addEventListener('click', function() {
-            // Se já estiver no admin, não faz nada
             if (modoAtual === 'admin') {
                 toast('Já está no modo Admin 🔓', '🔓');
                 return;
             }
-            // Se estiver no supervisor, não precisa confirmar
             abrirLogin('admin');
         });
 
@@ -1344,9 +1491,95 @@
         });
 
         // ============================================
+        // 🔥 AUTENTICAÇÃO - LOGIN COM FIREBASE AUTH
+        // ============================================
+        const telaLogin = document.getElementById('telaLogin');
+        const siteCompleto = document.getElementById('siteCompleto');
+        const btnFazerLogin = document.getElementById('btnFazerLogin');
+        const loginEmail = document.getElementById('loginEmail');
+        const loginSenha = document.getElementById('loginSenha');
+        const erroLoginAuth = document.getElementById('erroLoginAuth');
+        const loadingLogin = document.getElementById('loadingLogin');
+
+        function fazerLogin() {
+            const email = loginEmail.value.trim();
+            const senha = loginSenha.value.trim();
+
+            if (!email || !senha) {
+                erroLoginAuth.textContent = '❌ Preencha e-mail e senha';
+                erroLoginAuth.classList.add('show');
+                return;
+            }
+
+            erroLoginAuth.classList.remove('show');
+            loadingLogin.classList.add('show');
+            btnFazerLogin.disabled = true;
+            btnFazerLogin.textContent = 'Entrando...';
+
+            auth.signInWithEmailAndPassword(email, senha)
+                .then((userCredential) => {
+                    // Login bem-sucedido
+                    loadingLogin.classList.remove('show');
+                    btnFazerLogin.disabled = false;
+                    btnFazerLogin.textContent = 'Entrar no Sistema';
+                    telaLogin.style.display = 'none';
+                    siteCompleto.style.display = 'block';
+                    iniciarListener();
+                    ativarModo('convidado');
+                })
+                .catch((error) => {
+                    console.error('Erro no login:', error);
+                    loadingLogin.classList.remove('show');
+                    btnFazerLogin.disabled = false;
+                    btnFazerLogin.textContent = 'Entrar no Sistema';
+
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                        erroLoginAuth.textContent = '❌ E-mail ou senha incorretos';
+                    } else if (error.code === 'auth/invalid-email') {
+                        erroLoginAuth.textContent = '❌ E-mail inválido';
+                    } else if (error.code === 'auth/too-many-requests') {
+                        erroLoginAuth.textContent = '❌ Muitas tentativas. Aguarde um pouco.';
+                    } else {
+                        erroLoginAuth.textContent = '❌ Erro ao fazer login. Tente novamente.';
+                    }
+                    erroLoginAuth.classList.add('show');
+                    loginSenha.value = '';
+                    loginSenha.focus();
+                });
+        }
+
+        btnFazerLogin.addEventListener('click', fazerLogin);
+
+        loginSenha.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') fazerLogin();
+        });
+
+        loginEmail.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') loginSenha.focus();
+        });
+
+        // ============================================
+        // VERIFICA ESTADO DE AUTENTICAÇÃO
+        // ============================================
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                // Usuário logado
+                telaLogin.style.display = 'none';
+                siteCompleto.style.display = 'block';
+                iniciarListener();
+                ativarModo('convidado');
+                console.log('Usuário logado:', user.email);
+            } else {
+                // Usuário NÃO logado
+                telaLogin.style.display = 'flex';
+                siteCompleto.style.display = 'none';
+                console.log('Nenhum usuário logado');
+            }
+        });
+
+        // ============================================
         // INICIAR
         // ============================================
-        iniciarListener();
         ativarModo('convidado');
     </script>
 </body>
